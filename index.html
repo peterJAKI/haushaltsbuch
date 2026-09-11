@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#17a2b8">
+    <meta name="description" content="Deine Einnahmen und Ausgaben im Überblick">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Haushaltsbuch">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <title>Haushaltsbuch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0f7f6 0%, #e0f4ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .entry-section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .entry-section h2 {
+            font-size: 16px;
+            color: #17a2b8;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-btn {
+            padding: 10px 12px;
+            border: 2px solid #17a2b8;
+            background: white;
+            color: #17a2b8;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            background: #f0f8f9;
+        }
+
+        .category-btn.active {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+            border: none;
+            border-radius: 6px;
+            color: #333;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .summary-card h3 {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #17a2b8;
+        }
+
+        .summary-card.income .value {
+            color: #28a745;
+        }
+
+        .summary-card.expense .value {
+            color: #dc3545;
+        }
+
+        .entries-section {
+            margin-top: 25px;
+        }
+
+        .entries-section h2 {
+            font-size: 16px;
+            color: #17a2b8;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .entry-item:last-child {
+            border-bottom: none;
+        }
+
+        .entry-item .category {
+            font-weight: 500;
+            color: #333;
+            min-width: 100px;
+        }
+
+        .entry-item .date {
+            color: #999;
+            font-size: 12px;
+            min-width: 80px;
+        }
+
+        .entry-item .amount {
+            font-weight: 600;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .entry-item .amount.positive {
+            color: #28a745;
+        }
+
+        .entry-item .amount.negative {
+            color: #dc3545;
+        }
+
+        .entry-item .delete {
+            background: #f0f0f0;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .entry-item .delete:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .no-entries {
+            text-align: center;
+            color: #999;
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .month-selector button {
+            padding: 8px 15px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .month-selector button:hover {
+            background: #0d6eaa;
+        }
+
+        .month-selector span {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 10px 15px;
+            border: 2px solid #17a2b8;
+            background: white;
+            color: #17a2b8;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .progress-section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #17a2b8, #ffd700);
+            transition: width 0.3s ease;
+        }
+
+        .goal-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .goal-input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .goal-input-group input:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+
+        .goal-input-group button {
+            padding: 10px 15px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .goal-input-group button:hover {
+            background: #0d6eaa;
+        }
+
+        .compare-section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .compare-row {
+            margin-bottom: 14px;
+        }
+
+        .compare-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .compare-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .compare-bar-track {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .compare-bar-track .bar-tag {
+            font-size: 10px;
+            color: #999;
+            width: 55px;
+            flex-shrink: 0;
+        }
+
+        .compare-bar-bg {
+            flex: 1;
+            background: #eee;
+            border-radius: 4px;
+            height: 14px;
+            overflow: hidden;
+        }
+
+        .compare-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .compare-bar-fill.current {
+            background: #17a2b8;
+        }
+
+        .compare-bar-fill.previous {
+            background: #ffd700;
+        }
+
+        .compare-bar-value {
+            font-size: 11px;
+            color: #666;
+            width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .year-review-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .year-review-overlay.hidden {
+            display: none;
+        }
+
+        .year-review-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .year-review-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .year-review-body {
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .year-review-body .yr-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .year-review-body .yr-stat strong {
+            color: #17a2b8;
+        }
+
+        .hugo-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .hugo-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hugo-btn.hidden {
+            display: none;
+        }
+
+        .hugo-container {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 360px;
+            height: 480px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            border: 2px solid #17a2b8;
+        }
+
+        .hugo-container.hidden {
+            display: none;
+        }
+
+        .hugo-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid #0d6eaa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hugo-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .hugo-close:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .hugo-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hugo-message {
+            background: #f0f8f9;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .hugo-message.user {
+            align-self: flex-end;
+            background: #ffd700;
+            color: #333;
+            max-width: 85%;
+        }
+
+        .hugo-message.hugo {
+            align-self: flex-start;
+            max-width: 85%;
+        }
+
+        .hugo-input {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .hugo-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .hugo-input input:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+
+        .hugo-input button {
+            padding: 10px 15px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .hugo-input button:hover {
+            background: #0d6eaa;
+        }
+
+        @media (max-width: 600px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .entry-item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .entry-item .category {
+                flex: 1;
+                min-width: 100%;
+            }
+
+            .entry-item .date {
+                min-width: auto;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .hugo-container {
+                width: 90vw;
+                max-width: 360px;
+                bottom: auto;
+                top: 50%;
+                right: 50%;
+                transform: translateX(50%);
+            }
+
+            .hugo-btn {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Haushaltsbuch</h1>
+            <p>Deine Einnahmen und Ausgaben im Überblick</p>
+        </header>
+
+        <div class="content">
+            <div class="month-selector">
+                <button onclick="app.previousMonth()">← Vorheriger</button>
+                <span id="currentMonth"></span>
+                <button onclick="app.nextMonth()">Nächster →</button>
+            </div>
+
+            <div class="entry-section">
+                <h2>📝 Neuer Eintrag</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Kategorie wählen:</p>
+                <div class="categories-grid" id="categories"></div>
+
+                <div class="input-group">
+                    <input type="number" id="amount" placeholder="Summe eingeben" step="0.01" min="0">
+                    <button onclick="app.addEntry()">Hinzufügen</button>
+                </div>
+
+                <p style="color: #999; font-size: 12px; margin-top: 10px;">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
+            </div>
+
+            <div class="summary" id="summary"></div>
+
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <h2 style="font-size: 16px; color: #17a2b8; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">🎯 Sparfortschritt & Budget</h2>
+
+                <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px;">
+                    <div class="goal-input-group">
+                        <input type="number" id="monthlyGoal" placeholder="Monatliches Sparziel (€)" min="0" step="100">
+                        <button onclick="app.setMonthlyGoal()">Speichern</button>
+                    </div>
+                </div>
+
+                <div class="progress-item" id="savingsProgress" style="display: none;">
+                    <div class="progress-label">
+                        <span>💰 Sparziel</span>
+                        <span id="savingsPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="savingsFill" style="width: 0%"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                        <span id="savingsText">0€ / 0€</span>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>📅 Tagesbudget</span>
+                        <span id="budgetStatus" style="color: #28a745;">-</span>
+                    </div>
+                    <div style="font-size: 13px; color: #666; margin-top: 5px;">
+                        <span id="budgetText">Noch 0€ heute ausgeben (bei 0€ verbleibend im Monat)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="compare-section" id="compareSection" style="display: none;">
+                <h2 style="font-size: 16px; color: #17a2b8; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">📊 Monatsvergleich</h2>
+                <div id="compareChart"></div>
+            </div>
+
+            <div class="entries-section">
+                <h2>📋 Einträge</h2>
+                <div id="entries"></div>
+            </div>
+
+            <div class="actions">
+                <button class="action-btn" onclick="app.exportData()">💾 Daten exportieren</button>
+                <button class="action-btn" onclick="app.importData()">📂 Daten importieren</button>
+                <button class="action-btn" onclick="app.showYearReview()">📅 Jahresrückblick</button>
+                <button class="action-btn" onclick="app.clearMonth()" style="border-color: #dc3545; color: #dc3545;">🗑️ Monat löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="year-review-overlay hidden" id="yearReviewOverlay" onclick="if(event.target===this) app.closeYearReview()">
+        <div class="year-review-modal">
+            <div class="year-review-header">
+                <span>📅 Jahresrückblick</span>
+                <button class="hugo-close" onclick="app.closeYearReview()">✕</button>
+            </div>
+            <div class="year-review-body" id="yearReviewBody"></div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" style="display: none;" accept=".json">
+
+    <button class="hugo-btn" id="hugoToggleBtn" onclick="hugo.toggle()">🧑‍💼</button>
+
+    <div class="hugo-container hidden" id="hugoContainer">
+        <div class="hugo-header">
+            <span>🧑‍💼 Hugo – dein Spar-Berater</span>
+            <button class="hugo-close" onclick="hugo.toggle()">✕</button>
+        </div>
+        <div class="hugo-messages" id="hugoMessages"></div>
+        <div class="hugo-input">
+            <input type="text" id="hugoInput" placeholder="Frag Hugo etwas...">
+            <button onclick="hugo.send()">Senden</button>
+        </div>
+    </div>
+
+    <script>
+        const CATEGORIES = [
+            '💵 Gehalt/Rente',
+            '🏠 Miete',
+            '⚡ Strom',
+            '🛡️ Versicherung',
+            '📺 Abo',
+            '🍽️ Essen gehen',
+            '🛒 Lebensmittel',
+            '⛽ Tanken',
+            '🚗 Auto',
+            '💊 Apotheke',
+            '👗 Kleidung',
+            '💇 Friseur',
+            '🎬 Unterhaltung',
+            '📱 Telefon',
+            '💰 Sparen',
+            '📈 Investitionen'
+        ];
+
+        const app = {
+            data: {},
+            currentDate: new Date(),
+            settings: {},
+
+            init() {
+                this.loadData();
+                this.loadSettings();
+                this.render();
+                document.getElementById('amount').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addEntry();
+                });
+                document.getElementById('monthlyGoal').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.setMonthlyGoal();
+                });
+            },
+
+            getMonthKey() {
+                const year = this.currentDate.getFullYear();
+                const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+                return `${year}-${month}`;
+            },
+
+            getMonthData() {
+                const key = this.getMonthKey();
+                if (!this.data[key]) {
+                    this.data[key] = [];
+                }
+                return this.data[key];
+            },
+
+            getPreviousMonthKey() {
+                const d = new Date(this.currentDate);
+                d.setMonth(d.getMonth() - 1);
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            },
+
+            getCategoryTotalsFor(monthKey) {
+                const entries = this.data[monthKey] || [];
+                const byCategory = {};
+                entries.forEach(e => {
+                    if (!byCategory[e.category]) byCategory[e.category] = 0;
+                    byCategory[e.category] += e.amount;
+                });
+                return byCategory;
+            },
+
+            previousMonth() {
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                this.render();
+            },
+
+            nextMonth() {
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.render();
+            },
+
+            addEntry() {
+                const selected = document.querySelector('.category-btn.active');
+                const amount = parseFloat(document.getElementById('amount').value);
+
+                if (!selected || !amount || amount <= 0) {
+                    alert('Bitte wähle eine Kategorie und gib eine Summe ein');
+                    return;
+                }
+
+                const entry = {
+                    id: Date.now(),
+                    category: selected.textContent,
+                    amount: amount,
+                    date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                };
+
+                this.getMonthData().push(entry);
+                this.saveData();
+                document.getElementById('amount').value = '';
+                selected.classList.remove('active');
+                this.render();
+
+                if (entry.category.includes('💵') && typeof hugo !== 'undefined') {
+                    hugo.remindSalary(entry.amount);
+                }
+            },
+
+            deleteEntry(id) {
+                const data = this.getMonthData();
+                const index = data.findIndex(e => e.id === id);
+                if (index > -1) {
+                    data.splice(index, 1);
+                    this.saveData();
+                    this.render();
+                }
+            },
+
+            calculateTotals() {
+                const entries = this.getMonthData();
+                let income = 0, expenses = 0;
+
+                entries.forEach(e => {
+                    if (e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈')) {
+                        income += e.amount;
+                    } else {
+                        expenses += e.amount;
+                    }
+                });
+
+                return { income, expenses, balance: income - expenses };
+            },
+
+            exportData() {
+                const json = JSON.stringify(this.data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `haushaltsbuch-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            },
+
+            importData() {
+                document.getElementById('importFile').click();
+            },
+
+            showYearReview() {
+                const year = this.currentDate.getFullYear();
+                let totalIncome = 0, totalExpenses = 0;
+                const categoryTotals = {};
+                let bestMonth = null, worstMonth = null;
+
+                for (let m = 1; m <= 12; m++) {
+                    const key = `${year}-${String(m).padStart(2, '0')}`;
+                    const entries = this.data[key];
+                    if (!entries || entries.length === 0) continue;
+
+                    let monthIncome = 0, monthExpenses = 0;
+                    entries.forEach(e => {
+                        const isIncome = e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈');
+                        if (isIncome) {
+                            monthIncome += e.amount;
+                        } else {
+                            monthExpenses += e.amount;
+                            if (!categoryTotals[e.category]) categoryTotals[e.category] = 0;
+                            categoryTotals[e.category] += e.amount;
+                        }
+                    });
+
+                    totalIncome += monthIncome;
+                    totalExpenses += monthExpenses;
+
+                    const monthBalance = monthIncome - monthExpenses;
+                    if (bestMonth === null || monthBalance > bestMonth.balance) bestMonth = { key, balance: monthBalance };
+                    if (worstMonth === null || monthBalance < worstMonth.balance) worstMonth = { key, balance: monthBalance };
+                }
+
+                const monthName = (key) => {
+                    const [y, m] = key.split('-');
+                    return new Date(y, m - 1, 1).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                };
+
+                const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+                const topCategory = sortedCategories[0];
+
+                let html = `
+                    <div class="yr-stat"><span>Einnahmen ${year}</span><strong>+${totalIncome.toFixed(2)}€</strong></div>
+                    <div class="yr-stat"><span>Ausgaben ${year}</span><strong>-${totalExpenses.toFixed(2)}€</strong></div>
+                    <div class="yr-stat"><span>Gespart insgesamt</span><strong>${(totalIncome - totalExpenses >= 0 ? '+' : '')}${(totalIncome - totalExpenses).toFixed(2)}€</strong></div>
+                `;
+
+                if (topCategory) {
+                    html += `<div class="yr-stat"><span>Größte Ausgabe-Kategorie</span><strong>${topCategory[0]}: ${topCategory[1].toFixed(2)}€</strong></div>`;
+                }
+                if (bestMonth) {
+                    html += `<div class="yr-stat"><span>Bester Monat</span><strong>${monthName(bestMonth.key)}</strong></div>`;
+                }
+                if (worstMonth && worstMonth.key !== bestMonth.key) {
+                    html += `<div class="yr-stat"><span>Schwierigster Monat</span><strong>${monthName(worstMonth.key)}</strong></div>`;
+                }
+
+                if (totalIncome === 0 && totalExpenses === 0) {
+                    html = '<p>Noch keine Daten für dieses Jahr vorhanden. Trag ein paar Einträge ein, dann gibt es hier am Jahresende eine schöne Übersicht! 📊</p>';
+                }
+
+                document.getElementById('yearReviewBody').innerHTML = html;
+                document.getElementById('yearReviewOverlay').classList.remove('hidden');
+            },
+
+            closeYearReview() {
+                document.getElementById('yearReviewOverlay').classList.add('hidden');
+            },
+
+            renderComparison() {
+                const currentKey = this.getMonthKey();
+                const previousKey = this.getPreviousMonthKey();
+                const currentTotals = this.getCategoryTotalsFor(currentKey);
+                const previousTotals = this.getCategoryTotalsFor(previousKey);
+                const container = document.getElementById('compareSection');
+                const chart = document.getElementById('compareChart');
+
+                const hasPrevious = Object.keys(previousTotals).length > 0;
+                const hasCurrent = Object.keys(currentTotals).length > 0;
+
+                if (!hasPrevious || !hasCurrent) {
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'block';
+
+                const categories = [...new Set([...Object.keys(currentTotals), ...Object.keys(previousTotals)])]
+                    .filter(cat => !(cat.includes('💵') || cat.includes('💰') || cat.includes('📈')));
+
+                const maxValue = Math.max(1, ...categories.map(cat => Math.max(currentTotals[cat] || 0, previousTotals[cat] || 0)));
+
+                chart.innerHTML = categories.map(cat => {
+                    const curr = currentTotals[cat] || 0;
+                    const prev = previousTotals[cat] || 0;
+                    const currWidth = (curr / maxValue * 100).toFixed(1);
+                    const prevWidth = (prev / maxValue * 100).toFixed(1);
+                    const diff = curr - prev;
+                    const diffText = diff === 0 ? 'gleich' : (diff > 0 ? `+${diff.toFixed(2)}€` : `${diff.toFixed(2)}€`);
+                    const diffColor = diff > 0 ? '#dc3545' : (diff < 0 ? '#28a745' : '#999');
+
+                    return `
+                        <div class="compare-row">
+                            <div class="compare-label">
+                                <span>${cat}</span>
+                                <span style="color: ${diffColor};">${diffText}</span>
+                            </div>
+                            <div class="compare-bar-track">
+                                <span class="bar-tag">Diesen</span>
+                                <div class="compare-bar-bg"><div class="compare-bar-fill current" style="width: ${currWidth}%"></div></div>
+                                <span class="compare-bar-value">${curr.toFixed(2)}€</span>
+                            </div>
+                            <div class="compare-bar-track">
+                                <span class="bar-tag">Letzten</span>
+                                <div class="compare-bar-bg"><div class="compare-bar-fill previous" style="width: ${prevWidth}%"></div></div>
+                                <span class="compare-bar-value">${prev.toFixed(2)}€</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            clearMonth() {
+                if (confirm(`Wirklich alle Einträge für ${this.getMonthKey()} löschen?`)) {
+                    delete this.data[this.getMonthKey()];
+                    this.saveData();
+                    this.render();
+                }
+            },
+
+            saveData() {
+                localStorage.setItem('haushaltsbuch', JSON.stringify(this.data));
+            },
+
+            loadData() {
+                const stored = localStorage.getItem('haushaltsbuch');
+                this.data = stored ? JSON.parse(stored) : {};
+            },
+
+            loadSettings() {
+                const stored = localStorage.getItem('haushaltsbuch-settings');
+                this.settings = stored ? JSON.parse(stored) : { monthlyGoal: 0 };
+            },
+
+            saveSettings() {
+                localStorage.setItem('haushaltsbuch-settings', JSON.stringify(this.settings));
+            },
+
+            setMonthlyGoal() {
+                const input = document.getElementById('monthlyGoal');
+                const value = parseFloat(input.value);
+                if (value >= 0) {
+                    this.settings.monthlyGoal = value;
+                    this.saveSettings();
+                    this.render();
+                    input.value = '';
+                }
+            },
+
+            render() {
+                this.renderMonthSelector();
+                this.renderCategories();
+                this.renderSummary();
+                this.renderProgress();
+                this.renderComparison();
+                this.renderEntries();
+            },
+
+            renderMonthSelector() {
+                const monthName = this.currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                document.getElementById('currentMonth').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+            },
+
+            renderCategories() {
+                const container = document.getElementById('categories');
+                container.innerHTML = CATEGORIES.map(cat =>
+                    `<button class="category-btn" onclick="app.selectCategory(this)">${cat}</button>`
+                ).join('');
+            },
+
+            selectCategory(btn) {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            },
+
+            renderSummary() {
+                const { income, expenses, balance } = this.calculateTotals();
+                const balanceClass = balance >= 0 ? 'income' : 'expense';
+
+                document.getElementById('summary').innerHTML = `
+                    <div class="summary-card income">
+                        <h3>Einnahmen (Gehalt/Rente)</h3>
+                        <div class="value">+${income.toFixed(2)}€</div>
+                    </div>
+                    <div class="summary-card expense">
+                        <h3>Ausgaben</h3>
+                        <div class="value">-${expenses.toFixed(2)}€</div>
+                    </div>
+                    <div class="summary-card ${balanceClass}">
+                        <h3>Bilanz</h3>
+                        <div class="value">${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</div>
+                    </div>
+                `;
+            },
+
+            renderProgress() {
+                const { income, expenses, balance } = this.calculateTotals();
+                const goal = this.settings.monthlyGoal || 0;
+                const progressSection = document.getElementById('progressSection');
+
+                progressSection.style.display = 'block';
+                document.getElementById('monthlyGoal').value = goal > 0 ? goal : '';
+
+                if (goal > 0) {
+                    const saved = Math.max(0, balance);
+                    const percent = Math.round((saved / goal) * 100);
+                    document.getElementById('savingsProgress').style.display = 'block';
+                    document.getElementById('savingsFill').style.width = Math.min(percent, 100) + '%';
+                    document.getElementById('savingsPercent').textContent = percent + '%';
+                    document.getElementById('savingsText').textContent = `${saved.toFixed(2)}€ / ${goal.toFixed(2)}€`;
+                } else {
+                    document.getElementById('savingsProgress').style.display = 'none';
+                }
+
+                const daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
+                const dayOfMonth = new Date().getDate();
+                const daysLeft = daysInMonth - dayOfMonth + 1;
+                const monthlyBudget = income - expenses;
+                const dailyBudget = daysLeft > 0 ? monthlyBudget / daysLeft : 0;
+
+                const budgetStatus = document.getElementById('budgetStatus');
+                if (monthlyBudget >= 0) {
+                    budgetStatus.style.color = '#28a745';
+                    budgetStatus.textContent = '✓ OK';
+                } else {
+                    budgetStatus.style.color = '#dc3545';
+                    budgetStatus.textContent = '⚠ Über Budget';
+                }
+
+                document.getElementById('budgetText').innerHTML = `
+                    Noch <strong>${Math.max(0, dailyBudget).toFixed(2)}€</strong> heute ausgeben
+                    (${daysLeft} Tage, ${monthlyBudget.toFixed(2)}€ verbleibend im Monat)
+                `;
+            },
+
+            renderEntries() {
+                const entries = this.getMonthData().sort((a, b) => new Date(b.date) - new Date(a.date));
+                const container = document.getElementById('entries');
+
+                if (entries.length === 0) {
+                    container.innerHTML = '<div class="no-entries">Noch keine Einträge für diesen Monat</div>';
+                    return;
+                }
+
+                container.innerHTML = entries.map(e => `
+                    <div class="entry-item">
+                        <div class="category">${e.category}</div>
+                        <div class="date">${e.date}</div>
+                        <div class="amount ${e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? 'positive' : 'negative'}">
+                            ${(e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? '+' : '-')}${e.amount.toFixed(2)}€
+                        </div>
+                        <button class="delete" onclick="app.deleteEntry(${e.id})">✕</button>
+                    </div>
+                `).join('');
+            }
+        };
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        app.data = JSON.parse(evt.target.result);
+                        app.saveData();
+                        app.render();
+                        alert('Daten erfolgreich importiert!');
+                    } catch (err) {
+                        alert('Fehler beim Importieren: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        app.init();
+
+        const hugo = {
+            opened: false,
+            greeted: false,
+
+            toggle() {
+                const container = document.getElementById('hugoContainer');
+                const btn = document.getElementById('hugoToggleBtn');
+                this.opened = !this.opened;
+
+                if (this.opened) {
+                    container.classList.remove('hidden');
+                    btn.classList.add('hidden');
+                    if (!this.greeted) {
+                        this.greeted = true;
+                        this.addMessage(this.getGreeting(), 'hugo');
+                    }
+                    document.getElementById('hugoInput').focus();
+                } else {
+                    container.classList.add('hidden');
+                    btn.classList.remove('hidden');
+                }
+            },
+
+            addMessage(text, sender) {
+                const messages = document.getElementById('hugoMessages');
+                const div = document.createElement('div');
+                div.className = 'hugo-message ' + sender;
+                div.innerHTML = text;
+                messages.appendChild(div);
+                messages.scrollTop = messages.scrollHeight;
+            },
+
+            send() {
+                const input = document.getElementById('hugoInput');
+                const text = input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                input.value = '';
+
+                setTimeout(() => {
+                    const answer = this.getAnswer(text);
+                    this.addMessage(answer, 'hugo');
+                }, 400);
+            },
+
+            getStats() {
+                const entries = app.getMonthData();
+                const { income, expenses, balance } = app.calculateTotals();
+                const byCategory = {};
+
+                entries.forEach(e => {
+                    if (!byCategory[e.category]) byCategory[e.category] = { count: 0, total: 0 };
+                    byCategory[e.category].count++;
+                    byCategory[e.category].total += e.amount;
+                });
+
+                return { entries, income, expenses, balance, byCategory };
+            },
+
+            getEmergencyFund() {
+                let total = 0;
+                Object.values(app.data).forEach(entries => {
+                    entries.forEach(e => {
+                        if (e.category.includes('💰')) total += e.amount;
+                    });
+                });
+                return total;
+            },
+
+            getAvgMonthlyExpenses() {
+                const monthKeys = Object.keys(app.data).filter(k => app.data[k] && app.data[k].length > 0);
+                if (monthKeys.length === 0) return 0;
+
+                let total = 0;
+                monthKeys.forEach(key => {
+                    app.data[key].forEach(e => {
+                        if (!(e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈'))) {
+                            total += e.amount;
+                        }
+                    });
+                });
+                return total / monthKeys.length;
+            },
+
+            getSuggestedSavingsRate() {
+                const { balance } = this.getStats();
+                if (balance <= 0) return 0;
+                return Math.floor((balance * 0.7) / 10) * 10;
+            },
+
+            getNotgroschenStatus() {
+                const fund = this.getEmergencyFund();
+                const avgExpenses = this.getAvgMonthlyExpenses();
+                const target = avgExpenses * 3;
+                return { fund, target, reached: target > 0 ? fund >= target : false, missing: Math.max(0, target - fund) };
+            },
+
+            getGreeting() {
+                const { entries } = this.getStats();
+                let greeting = 'Hey Peter! 👋 Ich bin Hugo, dein Spar-Kumpel. ';
+
+                if (entries.length === 0) {
+                    greeting += 'Trag ein paar Ausgaben ein, dann schau ich mir das an und geb dir Tipps! 💡';
+                    return greeting;
+                }
+
+                greeting += 'Ich hab mir deinen Monat schon angeschaut:<br><br>' + this.findInsights().join('<br><br>');
+                greeting += '<br><br>Frag mich auch gern "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?" 😊';
+                return greeting;
+            },
+
+            remindSalary(amount) {
+                const container = document.getElementById('hugoContainer');
+                const btn = document.getElementById('hugoToggleBtn');
+                this.opened = true;
+                container.classList.remove('hidden');
+                btn.classList.add('hidden');
+
+                if (!this.greeted) {
+                    this.greeted = true;
+                    this.addMessage(this.getGreeting(), 'hugo');
+                }
+
+                const suggested = this.getSuggestedSavingsRate();
+                const notgroschen = this.getNotgroschenStatus();
+                let msg = `🎉 Zeit für deine Sparrate! Du hast gerade <strong>${amount.toFixed(2)}€</strong> als Gehalt/Rente eingetragen.<br><br>`;
+
+                if (!notgroschen.reached && notgroschen.target > 0) {
+                    msg += `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (ca. 3 Monatsausgaben = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
+                } else if (suggested > 0) {
+                    msg += `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Notgroschen steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
+                } else {
+                    msg += `Schau mal, was nach den Fixkosten übrig bleibt – dann kann ich dir eine konkrete Sparrate vorschlagen!`;
+                }
+
+                this.addMessage(msg, 'hugo');
+            },
+
+            findInsights() {
+                const { income, expenses, balance, byCategory } = this.getStats();
+                const tips = [];
+
+                const abo = byCategory['📺 Abo'];
+                if (abo && abo.count >= 2) {
+                    tips.push(`📺 Du hast <strong>${abo.count} Abo-Einträge</strong> mit zusammen ${abo.total.toFixed(2)}€. Das macht <strong>${(abo.total * 12).toFixed(2)}€ im Jahr</strong>! Schau mal, ob du wirklich alle brauchst – oft läuft da was nebenher mit, das keiner mehr nutzt.`);
+                }
+
+                const essen = byCategory['🍽️ Essen gehen'];
+                if (essen && income > 0 && essen.total > income * 0.1) {
+                    tips.push(`🍽️ Essen gehen hat dich diesen Monat ${essen.total.toFixed(2)}€ gekostet – das sind mehr als 10% deines Einkommens. Ein, zwei Mal weniger im Monat auswärts essen und du sparst locker ${(essen.total * 0.3).toFixed(2)}€!`);
+                }
+
+                const versicherung = byCategory['🛡️ Versicherung'];
+                if (versicherung && versicherung.count >= 2) {
+                    tips.push(`🛡️ Du hast ${versicherung.count} Versicherungs-Einträge. Manchmal zahlt man doppelt für ähnliche Sachen – ein Versicherungsvergleich einmal im Jahr lohnt sich meistens richtig.`);
+                }
+
+                if (balance < 0) {
+                    tips.push(`⚠️ Diesen Monat gibst du <strong>${Math.abs(balance).toFixed(2)}€ mehr aus, als reinkommt</strong>. Kein Grund zu Panik, aber schau mal, wo du kleine Schrauben drehen kannst.`);
+                } else if (balance > 0 && income > 0) {
+                    const suggested = this.getSuggestedSavingsRate();
+                    const notgroschen = this.getNotgroschenStatus();
+
+                    if (!notgroschen.reached && notgroschen.target > 0) {
+                        tips.push(`✅ Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (Ziel: ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€) – noch <strong>${notgroschen.missing.toFixed(2)}€</strong> fehlen als Sicherheitspuffer für Notfälle.`);
+                    } else {
+                        tips.push(`✅ Läuft gut! Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Berechnet vorgeschlagen: <strong>${suggested}€</strong> davon sparen, den Rest als Puffer lassen. Dein Notgroschen steht schon – das könntest du auch in einen ETF-Sparplan bei Trade Republic stecken!`);
+                    }
+                }
+
+                if (tips.length === 0) {
+                    tips.push('Bisher sieht bei dir alles ziemlich unauffällig aus – weiter so! 👍');
+                }
+
+                return tips;
+            },
+
+            getAnswer(question) {
+                const q = question.toLowerCase();
+                const { income, expenses, balance, byCategory, entries } = this.getStats();
+
+                if (entries.length === 0) {
+                    return 'Ich hab noch gar keine Einträge von dir diesen Monat gesehen. Trag mal was ein, dann kann ich dir konkrete Tipps geben! 📝';
+                }
+
+                if (q.includes('wie sieht') || q.includes('überblick') || q.includes('analyse') || q.includes('status')) {
+                    return `📊 So sieht's aus: Einnahmen <strong>${income.toFixed(2)}€</strong>, Ausgaben <strong>${expenses.toFixed(2)}€</strong>, Bilanz <strong>${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</strong>. ` + this.findInsights().join(' ');
+                }
+
+                if (q.includes('spar') && (q.includes('wo') || q.includes('wie') || q.includes('tipp'))) {
+                    const insights = this.findInsights();
+                    return insights.join('<br><br>') + '<br><br>💡 Und denk an die "Zuerst sparen"-Methode: Sobald Geld reinkommt, direkt einen Teil auf ein separates Konto packen – bevor du überhaupt die Chance hast, es auszugeben!';
+                }
+
+                if (q.includes('notgroschen') || q.includes('puffer') || q.includes('rücklage')) {
+                    const notgroschen = this.getNotgroschenStatus();
+                    if (notgroschen.target === 0) {
+                        return 'Dazu brauch ich ein bisschen mehr Daten von dir. Trag über ein paar Monate deine Ausgaben ein, dann kann ich dir sagen, wie groß dein Notgroschen sein sollte! 📝';
+                    }
+                    if (notgroschen.reached) {
+                        return `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ca. 3 Monatsausgaben). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
+                    }
+                    return `🛡️ Ein Notgroschen sollte etwa <strong>3 Monatsausgaben</strong> abdecken – bei dir wären das ca. <strong>${notgroschen.target.toFixed(2)}€</strong>. Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht!`;
+                }
+
+                if (q.includes('sparrate') || q.includes('wie viel') && q.includes('spar')) {
+                    const suggested = this.getSuggestedSavingsRate();
+                    if (suggested > 0) {
+                        return `💰 Berechnet aus deinem aktuellen Überschuss: Ich schlage <strong>${suggested}€ im Monat</strong> vor. Das lässt dir noch genug Puffer für Unvorhergesehenes.`;
+                    }
+                    return 'Aktuell bleibt bei dir nicht viel übrig zum Sparen. Schau mal bei "Wo kann ich sparen?" nach, ob wir was finden!';
+                }
+
+                if (q.includes('methode') || q.includes('3 konten') || q.includes('konten modell')) {
+                    return '💰 Die "Zuerst sparen"-Methode ist simpel:<br>1️⃣ <strong>Konto 1</strong>: Gehalt/Rente kommt rein<br>2️⃣ <strong>Konto 2</strong>: Fixkosten (Miete, Strom, Versicherung)<br>3️⃣ <strong>Konto 3</strong>: Zum Leben (Essen, Freizeit)<br><br>Der Trick: Die Sparrate wird SOFORT bei Geldeingang auf ein extra Konto verschoben – nicht erst am Monatsende, wenn eh nichts mehr übrig ist! 😉';
+                }
+
+                if (q.includes('abo')) {
+                    const abo = byCategory['📺 Abo'];
+                    if (abo) {
+                        return `📺 Du hast diesen Monat ${abo.count}x Abo-Kosten von insgesamt ${abo.total.toFixed(2)}€ eingetragen. Hochgerechnet aufs Jahr sind das <strong>${(abo.total * 12).toFixed(2)}€</strong>! Check mal auf deinem Kontoauszug, welche Abos wirklich noch genutzt werden.`;
+                    }
+                    return 'Ich seh diesen Monat keine Abo-Einträge bei dir. Wenn du welche hast, trag sie mal ein, dann schau ich sie mir an! 👍';
+                }
+
+                if (q.includes('trade republic') || q.includes('investier') || q.includes('etf') || q.includes('aktie')) {
+                    const notgroschen = this.getNotgroschenStatus();
+                    const suggested = this.getSuggestedSavingsRate();
+
+                    if (!notgroschen.reached && notgroschen.target > 0) {
+                        return `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (ca. 3 Monatsausgaben = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
+                    }
+
+                    let msg = `📈 Dein Notgroschen steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
+                    if (suggested > 0) {
+                        msg += ` Berechnet aus deinem aktuellen Überschuss könntest du z.B. <strong>${suggested}€/Monat</strong> automatisch in den Sparplan wandern lassen.`;
+                    }
+                    msg += ` Wichtig: Das ist kein Finanzrat, nur ein allgemeiner Denkanstoß – informier dich gut, bevor du was entscheidest! 😊`;
+                    return msg;
+                }
+
+                if (q.includes('budget') || q.includes('heute')) {
+                    const daysInMonth = new Date(app.currentDate.getFullYear(), app.currentDate.getMonth() + 1, 0).getDate();
+                    const dayOfMonth = new Date().getDate();
+                    const daysLeft = daysInMonth - dayOfMonth + 1;
+                    const dailyBudget = daysLeft > 0 ? balance / daysLeft : 0;
+                    return `📅 Du hast noch ${daysLeft} Tage in diesem Monat. Bei deiner aktuellen Bilanz kannst du noch etwa <strong>${Math.max(0, dailyBudget).toFixed(2)}€ pro Tag</strong> ausgeben, damit es am Monatsende aufgeht.`;
+                }
+
+                if (q.includes('danke')) {
+                    return 'Immer gerne, Peter! 😄 Ich bin ja für dich da.';
+                }
+
+                if (q.includes('hallo') || q.includes('hi') || q.includes('hey')) {
+                    return 'Hey! 👋 Frag mich gern "Wie sieht es aus?", "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?"';
+                }
+
+                return 'Frag mich zum Beispiel: "Wie sieht es aus?", "Wo kann ich sparen?", "Was sind meine Abos?" oder "Was ist die Zuerst-sparen-Methode?" 😊';
+            }
+        };
+
+        document.getElementById('hugoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') hugo.send();
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
