@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#17a2b8">
+    <meta name="theme-color" content="#17a2b8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)">
     <meta name="description" content="Deine Einnahmen und Ausgaben im Überblick">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,6 +13,86 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <title>Haushaltsbuch</title>
     <style>
+        :root {
+            --bg-page-1: #e0f7f6;
+            --bg-page-2: #e0f4ff;
+            --bg-container: #ffffff;
+            --bg-surface: #f9f9f9;
+            --bg-surface-alt: #f5f5f5;
+            --bg-hover: #f0f8f9;
+            --bg-input: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border-color: #e0e0e0;
+            --border-light: #dddddd;
+            --border-lighter: #eeeeee;
+            --accent: #17a2b8;
+            --accent-dark: #0d6eaa;
+            --gold: #ffd700;
+            --gold-dark: #ffa500;
+            --gold-hover: #ffed4e;
+            --success: #28a745;
+            --danger: #dc3545;
+            --danger-hover: #ff6b6b;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --overlay-color: rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-page-1: #0d1518;
+                --bg-page-2: #0e1620;
+                --bg-container: #17212b;
+                --bg-surface: #1d2933;
+                --bg-surface-alt: #212e38;
+                --bg-hover: #1c333a;
+                --bg-input: #1d2933;
+                --text-primary: #e8eef1;
+                --text-secondary: #aab7c0;
+                --text-muted: #8a97a0;
+                --border-color: #2e3d47;
+                --border-light: #35454f;
+                --border-lighter: #2a3941;
+                --accent: #2bc4dc;
+                --accent-dark: #4fa8d8;
+                --gold: #ffd700;
+                --gold-dark: #ffb300;
+                --gold-hover: #ffe066;
+                --success: #3ecb63;
+                --danger: #ff5f6d;
+                --danger-hover: #ff7a86;
+                --shadow-color: rgba(0, 0, 0, 0.4);
+                --overlay-color: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg-page-1: #0d1518;
+            --bg-page-2: #0e1620;
+            --bg-container: #17212b;
+            --bg-surface: #1d2933;
+            --bg-surface-alt: #212e38;
+            --bg-hover: #1c333a;
+            --bg-input: #1d2933;
+            --text-primary: #e8eef1;
+            --text-secondary: #aab7c0;
+            --text-muted: #8a97a0;
+            --border-color: #2e3d47;
+            --border-light: #35454f;
+            --border-lighter: #2a3941;
+            --accent: #2bc4dc;
+            --accent-dark: #4fa8d8;
+            --gold: #ffd700;
+            --gold-dark: #ffb300;
+            --gold-hover: #ffe066;
+            --success: #3ecb63;
+            --danger: #ff5f6d;
+            --danger-hover: #ff7a86;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --overlay-color: rgba(0, 0, 0, 0.7);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -20,7 +101,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #e0f7f6 0%, #e0f4ff 100%);
+            background: linear-gradient(135deg, var(--bg-page-1) 0%, var(--bg-page-2) 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -28,14 +109,14 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
+            background: var(--bg-container);
             border-radius: 12px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 16px var(--shadow-color);
             overflow: hidden;
         }
 
         header {
-            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -56,16 +137,16 @@
         }
 
         .entry-section {
-            background: #f9f9f9;
+            background: var(--bg-surface);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
         }
 
         .entry-section h2 {
             font-size: 16px;
-            color: #17a2b8;
+            color: var(--accent);
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -80,9 +161,9 @@
 
         .category-btn {
             padding: 10px 12px;
-            border: 2px solid #17a2b8;
-            background: white;
-            color: #17a2b8;
+            border: 2px solid var(--accent);
+            background: var(--bg-container);
+            color: var(--accent);
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
@@ -91,11 +172,11 @@
         }
 
         .category-btn:hover {
-            background: #f0f8f9;
+            background: var(--bg-hover);
         }
 
         .category-btn.active {
-            background: #17a2b8;
+            background: var(--accent);
             color: white;
         }
 
@@ -108,19 +189,21 @@
         .input-group input {
             flex: 1;
             padding: 10px 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 6px;
             font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: #17a2b8;
+            border-color: var(--accent);
         }
 
         .input-group button {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             border: none;
             border-radius: 6px;
             color: #333;
@@ -142,15 +225,15 @@
         }
 
         .summary-card {
-            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
-            border-left: 4px solid #17a2b8;
+            background: linear-gradient(135deg, var(--bg-surface-alt) 0%, var(--bg-container) 100%);
+            border-left: 4px solid var(--accent);
             padding: 15px;
             border-radius: 6px;
         }
 
         .summary-card h3 {
             font-size: 12px;
-            color: #666;
+            color: var(--text-secondary);
             text-transform: uppercase;
             margin-bottom: 5px;
         }
@@ -158,15 +241,15 @@
         .summary-card .value {
             font-size: 24px;
             font-weight: 700;
-            color: #17a2b8;
+            color: var(--accent);
         }
 
         .summary-card.income .value {
-            color: #28a745;
+            color: var(--success);
         }
 
         .summary-card.expense .value {
-            color: #dc3545;
+            color: var(--danger);
         }
 
         .entries-section {
@@ -175,7 +258,7 @@
 
         .entries-section h2 {
             font-size: 16px;
-            color: #17a2b8;
+            color: var(--accent);
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -186,7 +269,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
             font-size: 14px;
         }
 
@@ -196,12 +279,12 @@
 
         .entry-item .category {
             font-weight: 500;
-            color: #333;
+            color: var(--text-primary);
             min-width: 100px;
         }
 
         .entry-item .date {
-            color: #999;
+            color: var(--text-muted);
             font-size: 12px;
             min-width: 80px;
         }
@@ -213,17 +296,17 @@
         }
 
         .entry-item .amount.positive {
-            color: #28a745;
+            color: var(--success);
         }
 
         .entry-item .amount.negative {
-            color: #dc3545;
+            color: var(--danger);
         }
 
         .entry-item .delete {
-            background: #f0f0f0;
+            background: var(--bg-surface);
             border: none;
-            color: #999;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 4px;
@@ -232,13 +315,13 @@
         }
 
         .entry-item .delete:hover {
-            background: #ff6b6b;
+            background: var(--danger-hover);
             color: white;
         }
 
         .no-entries {
             text-align: center;
-            color: #999;
+            color: var(--text-muted);
             padding: 30px 20px;
             font-size: 14px;
         }
@@ -253,7 +336,7 @@
 
         .month-selector button {
             padding: 8px 15px;
-            background: #17a2b8;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 4px;
@@ -262,12 +345,12 @@
         }
 
         .month-selector button:hover {
-            background: #0d6eaa;
+            background: var(--accent-dark);
         }
 
         .month-selector span {
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
             min-width: 150px;
             text-align: center;
         }
@@ -282,9 +365,9 @@
 
         .action-btn {
             padding: 10px 15px;
-            border: 2px solid #17a2b8;
-            background: white;
-            color: #17a2b8;
+            border: 2px solid var(--accent);
+            background: var(--bg-container);
+            color: var(--accent);
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
@@ -293,16 +376,16 @@
         }
 
         .action-btn:hover {
-            background: #17a2b8;
+            background: var(--accent);
             color: white;
         }
 
         .progress-section {
-            background: #f9f9f9;
+            background: var(--bg-surface);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
         }
 
         .progress-item {
@@ -320,19 +403,19 @@
             margin-bottom: 8px;
             font-size: 13px;
             font-weight: 500;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .progress-bar {
             height: 12px;
-            background: #e0e0e0;
+            background: var(--border-color);
             border-radius: 6px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #17a2b8, #ffd700);
+            background: linear-gradient(90deg, var(--accent), var(--gold));
             transition: width 0.3s ease;
         }
 
@@ -345,19 +428,21 @@
         .goal-input-group input {
             flex: 1;
             padding: 10px 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 6px;
             font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
         }
 
         .goal-input-group input:focus {
             outline: none;
-            border-color: #17a2b8;
+            border-color: var(--accent);
         }
 
         .goal-input-group button {
             padding: 10px 15px;
-            background: #17a2b8;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 6px;
@@ -367,15 +452,15 @@
         }
 
         .goal-input-group button:hover {
-            background: #0d6eaa;
+            background: var(--accent-dark);
         }
 
         .compare-section {
-            background: #f9f9f9;
+            background: var(--bg-surface);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
         }
 
         .compare-row {
@@ -391,7 +476,7 @@
             justify-content: space-between;
             font-size: 13px;
             font-weight: 500;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 6px;
         }
 
@@ -404,14 +489,14 @@
 
         .compare-bar-track .bar-tag {
             font-size: 10px;
-            color: #999;
+            color: var(--text-muted);
             width: 55px;
             flex-shrink: 0;
         }
 
         .compare-bar-bg {
             flex: 1;
-            background: #eee;
+            background: var(--border-lighter);
             border-radius: 4px;
             height: 14px;
             overflow: hidden;
@@ -423,16 +508,16 @@
         }
 
         .compare-bar-fill.current {
-            background: #17a2b8;
+            background: var(--accent);
         }
 
         .compare-bar-fill.previous {
-            background: #ffd700;
+            background: var(--gold);
         }
 
         .compare-bar-value {
             font-size: 11px;
-            color: #666;
+            color: var(--text-secondary);
             width: 60px;
             text-align: right;
             flex-shrink: 0;
@@ -441,7 +526,7 @@
         .year-review-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--overlay-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -454,7 +539,7 @@
         }
 
         .year-review-modal {
-            background: white;
+            background: var(--bg-container);
             border-radius: 12px;
             max-width: 500px;
             width: 100%;
@@ -465,7 +550,7 @@
         }
 
         .year-review-header {
-            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             color: white;
             padding: 15px 20px;
             font-weight: 600;
@@ -478,7 +563,7 @@
             padding: 20px;
             overflow-y: auto;
             font-size: 14px;
-            color: #333;
+            color: var(--text-primary);
             line-height: 1.6;
         }
 
@@ -486,11 +571,11 @@
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lighter);
         }
 
         .year-review-body .yr-stat strong {
-            color: #17a2b8;
+            color: var(--accent);
         }
 
         .hugo-btn {
@@ -499,20 +584,20 @@
             right: 20px;
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             border: none;
             border-radius: 50%;
             color: white;
             font-size: 32px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px var(--shadow-color);
             z-index: 999;
             transition: all 0.3s;
         }
 
         .hugo-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 16px var(--shadow-color);
         }
 
         .hugo-btn.hidden {
@@ -525,14 +610,14 @@
             right: 20px;
             width: 360px;
             height: 480px;
-            background: white;
+            background: var(--bg-container);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px var(--shadow-color);
             display: flex;
             flex-direction: column;
             z-index: 1000;
             overflow: hidden;
-            border: 2px solid #17a2b8;
+            border: 2px solid var(--accent);
         }
 
         .hugo-container.hidden {
@@ -540,11 +625,11 @@
         }
 
         .hugo-header {
-            background: linear-gradient(135deg, #17a2b8 0%, #0d6eaa 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             color: white;
             padding: 15px;
             font-weight: 600;
-            border-bottom: 2px solid #0d6eaa;
+            border-bottom: 2px solid var(--accent-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -577,17 +662,17 @@
         }
 
         .hugo-message {
-            background: #f0f8f9;
+            background: var(--bg-hover);
             padding: 10px 12px;
             border-radius: 8px;
             font-size: 13px;
-            color: #333;
+            color: var(--text-primary);
             line-height: 1.4;
         }
 
         .hugo-message.user {
             align-self: flex-end;
-            background: #ffd700;
+            background: var(--gold);
             color: #333;
             max-width: 85%;
         }
@@ -601,26 +686,28 @@
             display: flex;
             gap: 8px;
             padding: 12px;
-            background: #f9f9f9;
-            border-top: 1px solid #e0e0e0;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
         }
 
         .hugo-input input {
             flex: 1;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-light);
             border-radius: 6px;
             font-size: 13px;
+            background: var(--bg-input);
+            color: var(--text-primary);
         }
 
         .hugo-input input:focus {
             outline: none;
-            border-color: #17a2b8;
+            border-color: var(--accent);
         }
 
         .hugo-input button {
             padding: 10px 15px;
-            background: #17a2b8;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 6px;
@@ -631,7 +718,53 @@
         }
 
         .hugo-input button:hover {
-            background: #0d6eaa;
+            background: var(--accent-dark);
+        }
+
+        .hint-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .hint-text.hint-small {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: var(--accent);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .goal-input-wrapper {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--bg-container);
+            border-radius: 6px;
+        }
+
+        .status-ok {
+            color: var(--success);
+        }
+
+        .status-warning {
+            color: var(--danger);
+        }
+
+        .action-btn-danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn-danger:hover {
+            background: var(--danger);
+            color: white;
         }
 
         @media (max-width: 600px) {
@@ -689,7 +822,7 @@
 
             <div class="entry-section">
                 <h2>📝 Neuer Eintrag</h2>
-                <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Kategorie wählen:</p>
+                <p class="hint-text">Kategorie wählen:</p>
                 <div class="categories-grid" id="categories"></div>
 
                 <div class="input-group">
@@ -697,15 +830,15 @@
                     <button onclick="app.addEntry()">Hinzufügen</button>
                 </div>
 
-                <p style="color: #999; font-size: 12px; margin-top: 10px;">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
+                <p class="hint-text hint-small">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
             </div>
 
             <div class="summary" id="summary"></div>
 
             <div class="progress-section" id="progressSection" style="display: none;">
-                <h2 style="font-size: 16px; color: #17a2b8; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">🎯 Sparfortschritt & Budget</h2>
+                <h2 class="section-title">🎯 Sparfortschritt & Budget</h2>
 
-                <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px;">
+                <div class="goal-input-wrapper">
                     <div class="goal-input-group">
                         <input type="number" id="monthlyGoal" placeholder="Monatliches Sparziel (€)" min="0" step="100">
                         <button onclick="app.setMonthlyGoal()">Speichern</button>
@@ -720,7 +853,7 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="savingsFill" style="width: 0%"></div>
                     </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                    <div class="hint-text hint-small">
                         <span id="savingsText">0€ / 0€</span>
                     </div>
                 </div>
@@ -728,16 +861,16 @@
                 <div class="progress-item">
                     <div class="progress-label">
                         <span>📅 Tagesbudget</span>
-                        <span id="budgetStatus" style="color: #28a745;">-</span>
+                        <span id="budgetStatus" class="status-ok">-</span>
                     </div>
-                    <div style="font-size: 13px; color: #666; margin-top: 5px;">
+                    <div class="hint-text">
                         <span id="budgetText">Noch 0€ heute ausgeben (bei 0€ verbleibend im Monat)</span>
                     </div>
                 </div>
             </div>
 
             <div class="compare-section" id="compareSection" style="display: none;">
-                <h2 style="font-size: 16px; color: #17a2b8; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">📊 Monatsvergleich</h2>
+                <h2 class="section-title">📊 Monatsvergleich</h2>
                 <div id="compareChart"></div>
             </div>
 
@@ -750,7 +883,7 @@
                 <button class="action-btn" onclick="app.exportData()">💾 Daten exportieren</button>
                 <button class="action-btn" onclick="app.importData()">📂 Daten importieren</button>
                 <button class="action-btn" onclick="app.showYearReview()">📅 Jahresrückblick</button>
-                <button class="action-btn" onclick="app.clearMonth()" style="border-color: #dc3545; color: #dc3545;">🗑️ Monat löschen</button>
+                <button class="action-btn action-btn-danger" onclick="app.clearMonth()">🗑️ Monat löschen</button>
             </div>
         </div>
     </div>
@@ -1021,13 +1154,13 @@
                     const prevWidth = (prev / maxValue * 100).toFixed(1);
                     const diff = curr - prev;
                     const diffText = diff === 0 ? 'gleich' : (diff > 0 ? `+${diff.toFixed(2)}€` : `${diff.toFixed(2)}€`);
-                    const diffColor = diff > 0 ? '#dc3545' : (diff < 0 ? '#28a745' : '#999');
+                    const diffClass = diff > 0 ? 'status-warning' : (diff < 0 ? 'status-ok' : '');
 
                     return `
                         <div class="compare-row">
                             <div class="compare-label">
                                 <span>${cat}</span>
-                                <span style="color: ${diffColor};">${diffText}</span>
+                                <span class="${diffClass}">${diffText}</span>
                             </div>
                             <div class="compare-bar-track">
                                 <span class="bar-tag">Diesen</span>
@@ -1154,10 +1287,10 @@
 
                 const budgetStatus = document.getElementById('budgetStatus');
                 if (monthlyBudget >= 0) {
-                    budgetStatus.style.color = '#28a745';
+                    budgetStatus.className = 'status-ok';
                     budgetStatus.textContent = '✓ OK';
                 } else {
-                    budgetStatus.style.color = '#dc3545';
+                    budgetStatus.className = 'status-warning';
                     budgetStatus.textContent = '⚠ Über Budget';
                 }
 
