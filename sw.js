@@ -1,4 +1,4 @@
-const CACHE_NAME = 'haushaltsbuch-v2';
+const CACHE_NAME = 'haushaltsbuch-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -35,8 +35,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  const freshRequest = new Request(event.request, { cache: 'no-store' });
+
   event.respondWith(
-    fetch(event.request).then(response => {
+    fetch(freshRequest).then(response => {
       if (response && response.status === 200) {
         const responseToCache = response.clone();
         caches.open(CACHE_NAME).then(cache => {

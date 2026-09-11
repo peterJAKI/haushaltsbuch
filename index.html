@@ -1822,6 +1822,13 @@
             navigator.serviceWorker.register('sw.js').catch(err => {
                 console.log('Service Worker registration failed:', err);
             });
+
+            let refreshed = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshed) return;
+                refreshed = true;
+                window.location.reload();
+            });
         }
     </script>
 </body>
