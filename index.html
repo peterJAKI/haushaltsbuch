@@ -768,6 +768,55 @@
             color: white;
         }
 
+        .remove-btn {
+            background: var(--bg-surface);
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger-hover);
+            color: white;
+        }
+
+        .category-btn-add {
+            border-style: dashed;
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+        .category-btn-add:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .categories-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -5px;
+            margin-bottom: 15px;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 4px;
+        }
+
+        .link-btn:hover {
+            color: var(--accent);
+        }
+
         @media (max-width: 600px) {
             .categories-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -833,6 +882,10 @@
                 <h2>📝 Neuer Eintrag</h2>
                 <p class="hint-text">Kategorie wählen:</p>
                 <div class="categories-grid" id="categories"></div>
+
+                <div class="categories-footer">
+                    <button class="link-btn" onclick="app.manageCategories()">⚙️ Kategorien verwalten</button>
+                </div>
 
                 <div class="input-group">
                     <input type="number" id="amount" placeholder="Summe eingeben" step="0.01" min="0">
@@ -928,7 +981,11 @@
             '💵 Gehalt/Rente',
             '🏠 Miete',
             '⚡ Strom',
-            '🛡️ Versicherung',
+            '🚑 Unfallversicherung',
+            '🛡️ Haftpflichtversicherung',
+            '🛋️ Hausratversicherung',
+            '🕊️ Sterbeversicherung',
+            '⚖️ Rechtsschutzversicherung',
             '📺 Abo',
             '🍽️ Essen gehen',
             '🛒 Lebensmittel',
@@ -947,10 +1004,12 @@
             data: {},
             currentDate: new Date(),
             settings: {},
+            customCategories: [],
 
             init() {
                 this.loadData();
                 this.loadSettings();
+                this.loadCustomCategories();
                 this.render();
                 document.getElementById('amount').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addEntry();
@@ -1067,6 +1126,7 @@
             },
 
             showYearReview() {
+                document.querySelector('.year-review-header span').textContent = '📅 Jahresrückblick';
                 const year = this.currentDate.getFullYear();
                 let totalIncome = 0, totalExpenses = 0;
                 const categoryTotals = {};
@@ -1208,6 +1268,56 @@
                 this.settings = stored ? JSON.parse(stored) : { monthlyGoal: 0 };
             },
 
+            loadCustomCategories() {
+                const stored = localStorage.getItem('haushaltsbuch-custom-categories');
+                this.customCategories = stored ? JSON.parse(stored) : [];
+            },
+
+            saveCustomCategories() {
+                localStorage.setItem('haushaltsbuch-custom-categories', JSON.stringify(this.customCategories));
+            },
+
+            addCustomCategory() {
+                const input = prompt('Neue Kategorie hinzufügen.\n\nTipp: Emoji + Name, z.B. "🎯 Hobby"');
+                if (!input || !input.trim()) return;
+                const trimmed = input.trim();
+
+                if (CATEGORIES.includes(trimmed) || this.customCategories.includes(trimmed)) {
+                    alert('Diese Kategorie gibt es schon!');
+                    return;
+                }
+
+                this.customCategories.push(trimmed);
+                this.saveCustomCategories();
+                this.renderCategories();
+            },
+
+            manageCategories() {
+                const body = document.getElementById('yearReviewBody');
+                const header = document.querySelector('.year-review-header span');
+                header.textContent = '⚙️ Eigene Kategorien';
+
+                if (this.customCategories.length === 0) {
+                    body.innerHTML = '<p>Du hast noch keine eigenen Kategorien hinzugefügt. Klick auf "+ Kategorie" unter der Liste, um eine anzulegen.</p>';
+                } else {
+                    body.innerHTML = this.customCategories.map((cat, i) => `
+                        <div class="yr-stat">
+                            <span>${cat}</span>
+                            <button class="remove-btn" onclick="app.deleteCustomCategory(${i})">✕ Entfernen</button>
+                        </div>
+                    `).join('');
+                }
+
+                document.getElementById('yearReviewOverlay').classList.remove('hidden');
+            },
+
+            deleteCustomCategory(index) {
+                this.customCategories.splice(index, 1);
+                this.saveCustomCategories();
+                this.renderCategories();
+                this.manageCategories();
+            },
+
             saveSettings() {
                 localStorage.setItem('haushaltsbuch-settings', JSON.stringify(this.settings));
             },
@@ -1239,9 +1349,10 @@
 
             renderCategories() {
                 const container = document.getElementById('categories');
-                container.innerHTML = CATEGORIES.map(cat =>
+                const allCategories = [...CATEGORIES, ...this.customCategories];
+                container.innerHTML = allCategories.map(cat =>
                     `<button class="category-btn" onclick="app.selectCategory(this)">${cat}</button>`
-                ).join('');
+                ).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()">➕ Kategorie</button>`;
             },
 
             selectCategory(btn) {
