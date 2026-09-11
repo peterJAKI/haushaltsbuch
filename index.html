@@ -29,6 +29,7 @@
             --border-lighter: #eeeeee;
             --accent: #17a2b8;
             --accent-dark: #0d6eaa;
+            --category-border: #17a2b8;
             --gold: #ffd700;
             --gold-dark: #ffa500;
             --gold-hover: #ffed4e;
@@ -54,8 +55,9 @@
                 --border-color: #2e3d47;
                 --border-light: #35454f;
                 --border-lighter: #2a3941;
-                --accent: #22d3f0;
+                --accent: #2bc4dc;
                 --accent-dark: #4fa8d8;
+                --category-border: #ffffff;
                 --gold: #ffd700;
                 --gold-dark: #ffb300;
                 --gold-hover: #ffe066;
@@ -81,8 +83,9 @@
             --border-color: #2e3d47;
             --border-light: #35454f;
             --border-lighter: #2a3941;
-            --accent: #22d3f0;
+            --accent: #2bc4dc;
             --accent-dark: #4fa8d8;
+            --category-border: #ffffff;
             --gold: #ffd700;
             --gold-dark: #ffb300;
             --gold-hover: #ffe066;
@@ -167,7 +170,7 @@
             gap: 5px;
             min-height: 72px;
             padding: 10px 6px;
-            border: 2px solid var(--accent);
+            border: 2px solid var(--category-border);
             background: var(--bg-container);
             color: var(--accent);
             border-radius: 6px;
@@ -1434,13 +1437,22 @@
                 document.getElementById('currentMonth').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
             },
 
+            splitCategory(cat) {
+                const spaceIndex = cat.indexOf(' ');
+                const firstToken = spaceIndex > -1 ? cat.slice(0, spaceIndex) : cat;
+                const isEmoji = /\p{Extended_Pictographic}/u.test(firstToken) && firstToken.length <= 4;
+
+                if (isEmoji && spaceIndex > -1) {
+                    return { icon: firstToken, label: cat.slice(spaceIndex + 1) };
+                }
+                return { icon: this.guessEmoji(cat), label: cat };
+            },
+
             renderCategories() {
                 const container = document.getElementById('categories');
                 const allCategories = [...CATEGORIES, ...this.customCategories];
                 container.innerHTML = allCategories.map(cat => {
-                    const spaceIndex = cat.indexOf(' ');
-                    const icon = spaceIndex > -1 ? cat.slice(0, spaceIndex) : '🏷️';
-                    const label = spaceIndex > -1 ? cat.slice(spaceIndex + 1) : cat;
+                    const { icon, label } = this.splitCategory(cat);
                     return `<button class="category-btn" data-category="${cat}" onclick="app.selectCategory(this)"><span class="cat-icon">${icon}</span><span class="cat-label">${label}</span></button>`;
                 }).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()"><span class="cat-icon">➕</span><span class="cat-label">Kategorie</span></button>`;
             },
