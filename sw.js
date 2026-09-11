@@ -1,4 +1,4 @@
-const CACHE_NAME = 'haushaltsbuch-v1';
+const CACHE_NAME = 'haushaltsbuch-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(ASSETS).catch(() => {
@@ -25,7 +26,7 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -35,25 +36,18 @@ self.addEventListener('fetch', event => {
   }
 
   event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200) {
-          return response;
-        }
-
+    fetch(event.request).then(response => {
+      if (response && response.status === 200) {
         const responseToCache = response.clone();
         caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, responseToCache);
         });
-
-        return response;
-      });
+      }
+      return response;
     }).catch(() => {
-      return caches.match('./index.html');
+      return caches.match(event.request).then(cached => {
+        return cached || caches.match('./index.html');
+      });
     })
   );
 });

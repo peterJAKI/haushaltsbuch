@@ -160,15 +160,34 @@
         }
 
         .category-btn {
-            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-height: 72px;
+            padding: 10px 6px;
             border: 2px solid var(--accent);
             background: var(--bg-container);
             color: var(--accent);
             border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
             font-weight: 500;
             transition: all 0.2s;
+        }
+
+        .category-btn .cat-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .category-btn .cat-label {
+            font-size: 11.5px;
+            line-height: 1.25;
+            text-align: center;
+            word-break: break-word;
+            hyphens: auto;
+            max-width: 100%;
         }
 
         .category-btn:hover {
@@ -1070,7 +1089,7 @@
 
                 const entry = {
                     id: Date.now(),
-                    category: selected.textContent,
+                    category: selected.dataset.category,
                     amount: amount,
                     date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
                 };
@@ -1277,10 +1296,72 @@
                 localStorage.setItem('haushaltsbuch-custom-categories', JSON.stringify(this.customCategories));
             },
 
+            guessEmoji(name) {
+                const n = name.toLowerCase();
+                const keywordMap = [
+                    [['miete', 'mieter', 'wohnung', 'vermieter'], '🏠'],
+                    [['versicherung', 'police'], '🛡️'],
+                    [['auto', 'kfz', 'wagen', 'werkstatt', 'reifen'], '🚗'],
+                    [['strom', 'energie'], '⚡'],
+                    [['gas', 'heizung', 'öl'], '🔥'],
+                    [['wasser'], '💧'],
+                    [['internet', 'wlan', 'router'], '🌐'],
+                    [['telefon', 'handy', 'mobilfunk'], '📱'],
+                    [['abo', 'abonnement', 'streaming'], '📺'],
+                    [['essen', 'restaurant'], '🍽️'],
+                    [['lebensmittel', 'supermarkt', 'einkauf'], '🛒'],
+                    [['tanken', 'benzin', 'diesel', 'sprit'], '⛽'],
+                    [['apotheke', 'medizin', 'arzt', 'gesundheit'], '💊'],
+                    [['kleidung', 'klamotten', 'schuhe'], '👗'],
+                    [['friseur', 'haare'], '💇'],
+                    [['kino', 'unterhaltung', 'freizeit'], '🎬'],
+                    [['sparen', 'sparkonto'], '💰'],
+                    [['aktie', 'invest', 'etf', 'fonds', 'depot'], '📈'],
+                    [['hobby'], '🎯'],
+                    [['reise', 'urlaub', 'flug', 'ferien'], '✈️'],
+                    [['geschenk'], '🎁'],
+                    [['kind', 'kita', 'schule', 'baby'], '👶'],
+                    [['tier', 'hund', 'katze', 'haustier'], '🐾'],
+                    [['sport', 'fitness', 'gym'], '🏋️'],
+                    [['bildung', 'kurs', 'seminar', 'weiterbildung'], '📚'],
+                    [['spende', 'wohltätig'], '❤️'],
+                    [['steuer', 'finanzamt'], '🧾'],
+                    [['möbel', 'einrichtung', 'ikea'], '🛋️'],
+                    [['garten', 'pflanze'], '🌱'],
+                    [['computer', 'pc', 'laptop', 'software'], '💻'],
+                    [['musik', 'konzert', 'instrument'], '🎵'],
+                    [['buch', 'zeitschrift'], '📖'],
+                    [['bank', 'gebühr', 'kredit', 'darlehen'], '🏦'],
+                    [['rechtsschutz', 'anwalt', 'gericht'], '⚖️'],
+                    [['unfall'], '🚑'],
+                    [['hausrat'], '🛋️'],
+                    [['sterbe', 'bestattung'], '🕊️']
+                ];
+
+                for (const [keywords, emoji] of keywordMap) {
+                    if (keywords.some(k => n.includes(k))) return emoji;
+                }
+                return '🏷️';
+            },
+
             addCustomCategory() {
-                const input = prompt('Neue Kategorie hinzufügen.\n\nTipp: Emoji + Name, z.B. "🎯 Hobby"');
+                const input = prompt('Neue Kategorie hinzufügen.\n\nEinfach den Namen eingeben, z.B. "Mieterschutz" – ein passendes Symbol wird automatisch ausgewählt.');
                 if (!input || !input.trim()) return;
-                const trimmed = input.trim();
+                let name = input.trim();
+
+                let icon = '🏷️';
+                const spaceIndex = name.indexOf(' ');
+                const firstWord = spaceIndex > -1 ? name.slice(0, spaceIndex) : name;
+                const isEmojiPrefix = /\p{Extended_Pictographic}/u.test(firstWord) && firstWord.length <= 4;
+
+                if (isEmojiPrefix) {
+                    icon = firstWord;
+                    name = spaceIndex > -1 ? name.slice(spaceIndex + 1) : name;
+                } else {
+                    icon = this.guessEmoji(name);
+                }
+
+                const trimmed = `${icon} ${name}`;
 
                 if (CATEGORIES.includes(trimmed) || this.customCategories.includes(trimmed)) {
                     alert('Diese Kategorie gibt es schon!');
@@ -1350,9 +1431,12 @@
             renderCategories() {
                 const container = document.getElementById('categories');
                 const allCategories = [...CATEGORIES, ...this.customCategories];
-                container.innerHTML = allCategories.map(cat =>
-                    `<button class="category-btn" onclick="app.selectCategory(this)">${cat}</button>`
-                ).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()">➕ Kategorie</button>`;
+                container.innerHTML = allCategories.map(cat => {
+                    const spaceIndex = cat.indexOf(' ');
+                    const icon = spaceIndex > -1 ? cat.slice(0, spaceIndex) : '🏷️';
+                    const label = spaceIndex > -1 ? cat.slice(spaceIndex + 1) : cat;
+                    return `<button class="category-btn" data-category="${cat}" onclick="app.selectCategory(this)"><span class="cat-icon">${icon}</span><span class="cat-label">${label}</span></button>`;
+                }).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()"><span class="cat-icon">➕</span><span class="cat-label">Kategorie</span></button>`;
             },
 
             selectCategory(btn) {
