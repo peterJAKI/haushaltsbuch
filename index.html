@@ -501,12 +501,12 @@
             margin-bottom: 15px;
         }
 
-        .cancelled-input-group input[type="text"] {
+        .cancelled-input-group #cancelledName {
             flex: 2;
             min-width: 120px;
         }
 
-        .cancelled-input-group input[type="number"] {
+        .cancelled-input-group #cancelledAmount {
             flex: 1;
             min-width: 100px;
         }
@@ -1028,7 +1028,7 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="number" id="amount" placeholder="Summe eingeben" step="0.01" min="0">
+                    <input type="text" inputmode="decimal" id="amount" placeholder="Summe eingeben">
                     <button onclick="app.addEntry()">Hinzufügen</button>
                 </div>
 
@@ -1042,7 +1042,7 @@
 
                 <div class="goal-input-wrapper">
                     <div class="goal-input-group">
-                        <input type="number" id="monthlyGoal" placeholder="Monatliches Sparziel (€)" min="0" step="100">
+                        <input type="text" inputmode="decimal" id="monthlyGoal" placeholder="Monatliches Sparziel (€)">
                         <button onclick="app.setMonthlyGoal()">Speichern</button>
                     </div>
                 </div>
@@ -1077,7 +1077,7 @@
 
                 <div class="cancelled-input-group">
                     <input type="text" id="cancelledName" placeholder="z.B. ADAC">
-                    <input type="number" id="cancelledAmount" placeholder="Betrag (€)" min="0" step="0.01">
+                    <input type="text" inputmode="decimal" id="cancelledAmount" placeholder="Betrag (€)">
                     <select id="cancelledPeriod">
                         <option value="jahr">pro Jahr</option>
                         <option value="monat">pro Monat</option>
@@ -1199,6 +1199,11 @@
                 return `${year}-${month}`;
             },
 
+            parseAmount(value) {
+                if (typeof value !== 'string') return parseFloat(value);
+                return parseFloat(value.trim().replace(',', '.'));
+            },
+
             getMonthData() {
                 const key = this.getMonthKey();
                 if (!this.data[key]) {
@@ -1235,7 +1240,7 @@
 
             addEntry() {
                 const selected = document.querySelector('.category-btn.active');
-                const amount = parseFloat(document.getElementById('amount').value);
+                const amount = this.parseAmount(document.getElementById('amount').value);
 
                 if (!selected || !amount || amount <= 0) {
                     alert('Bitte wähle eine Kategorie und gib eine Summe ein');
@@ -1462,7 +1467,7 @@
                 const periodSelect = document.getElementById('cancelledPeriod');
 
                 const name = nameInput.value.trim();
-                const amount = parseFloat(amountInput.value);
+                const amount = this.parseAmount(amountInput.value);
                 const period = periodSelect.value;
 
                 if (!name || !amount || amount <= 0) {
@@ -1643,7 +1648,7 @@
 
             setMonthlyGoal() {
                 const input = document.getElementById('monthlyGoal');
-                const value = parseFloat(input.value);
+                const value = this.parseAmount(input.value);
                 if (value >= 0) {
                     this.settings.monthlyGoal = value;
                     this.saveSettings();
