@@ -242,6 +242,23 @@
             transition: all 0.2s;
         }
 
+        .recurring-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .recurring-check input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
         .input-group button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
@@ -1032,7 +1049,13 @@
                     <button onclick="app.addEntry()">Hinzufügen</button>
                 </div>
 
+                <label class="recurring-check">
+                    <input type="checkbox" id="markRecurring">
+                    🔁 Als feste Kosten merken (wird jeden Monat automatisch eingetragen)
+                </label>
+
                 <p class="hint-text hint-small">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
+                <p class="hint-text hint-small"><button class="link-btn" onclick="app.manageRecurringCosts()">🔁 Feste Kosten verwalten</button></p>
             </div>
 
             <div class="summary" id="summary"></div>
@@ -1179,12 +1202,14 @@
             settings: {},
             customCategories: [],
             cancelledCosts: [],
+            recurringCosts: [],
 
             init() {
-                this.loadData();
                 this.loadSettings();
                 this.loadCustomCategories();
                 this.loadCancelledCosts();
+                this.loadRecurringCosts();
+                this.loadData();
                 this.render();
                 this.renderCancelledCosts();
                 document.getElementById('amount').addEventListener('keypress', (e) => {
@@ -1201,10 +1226,12 @@
                 });
             },
 
+            getKeyFor(date) {
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            },
+
             getMonthKey() {
-                const year = this.currentDate.getFullYear();
-                const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
-                return `${year}-${month}`;
+                return this.getKeyFor(this.currentDate);
             },
 
             parseAmount(value) {
@@ -1216,6 +1243,20 @@
                 const key = this.getMonthKey();
                 if (!this.data[key]) {
                     this.data[key] = [];
+
+                    const todayKey = this.getKeyFor(new Date());
+                    if (key >= todayKey && this.recurringCosts.length > 0) {
+                        this.recurringCosts.forEach(rc => {
+                            this.data[key].push({
+                                id: Date.now() + Math.floor(Math.random() * 1000),
+                                category: rc.category,
+                                amount: rc.amount,
+                                date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+                                recurring: true
+                            });
+                        });
+                        this.saveData();
+                    }
                 }
                 return this.data[key];
             },
@@ -1264,6 +1305,13 @@
 
                 this.getMonthData().push(entry);
                 this.saveData();
+
+                const markRecurring = document.getElementById('markRecurring');
+                if (markRecurring && markRecurring.checked) {
+                    this.addRecurringCost(entry.category, entry.amount);
+                    markRecurring.checked = false;
+                }
+
                 document.getElementById('amount').value = '';
                 selected.classList.remove('active');
                 this.render();
@@ -1463,6 +1511,53 @@
             loadCancelledCosts() {
                 const stored = localStorage.getItem('haushaltsbuch-cancelled-costs');
                 this.cancelledCosts = stored ? JSON.parse(stored) : [];
+            },
+
+            loadRecurringCosts() {
+                const stored = localStorage.getItem('haushaltsbuch-recurring-costs');
+                this.recurringCosts = stored ? JSON.parse(stored) : [];
+            },
+
+            saveRecurringCosts() {
+                localStorage.setItem('haushaltsbuch-recurring-costs', JSON.stringify(this.recurringCosts));
+            },
+
+            addRecurringCost(category, amount) {
+                const existing = this.recurringCosts.find(rc => rc.category === category);
+                if (existing) {
+                    existing.amount = amount;
+                } else {
+                    this.recurringCosts.push({ id: Date.now(), category, amount });
+                }
+                this.saveRecurringCosts();
+            },
+
+            deleteRecurringCost(id) {
+                this.recurringCosts = this.recurringCosts.filter(rc => rc.id !== id);
+                this.saveRecurringCosts();
+                this.manageRecurringCosts();
+            },
+
+            manageRecurringCosts() {
+                const body = document.getElementById('yearReviewBody');
+                const header = document.querySelector('.year-review-header span');
+                header.textContent = '🔁 Feste Kosten';
+
+                if (this.recurringCosts.length === 0) {
+                    body.innerHTML = '<p>Noch keine festen Kosten hinterlegt. Setz beim nächsten Eintrag den Haken bei "Als feste Kosten merken", dann erscheint er hier und wird ab dem nächsten Monat automatisch eingetragen.</p>';
+                } else {
+                    body.innerHTML = this.recurringCosts.map(rc => {
+                        const { icon, label } = this.splitCategory(rc.category);
+                        return `
+                            <div class="yr-stat">
+                                <span>${icon} ${label} – ${rc.amount.toFixed(2)}€/Monat</span>
+                                <button class="remove-btn" onclick="app.deleteRecurringCost(${rc.id})">✕ Entfernen</button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                document.getElementById('yearReviewOverlay').classList.remove('hidden');
             },
 
             saveCancelledCosts() {
@@ -1786,7 +1881,7 @@
 
                 container.innerHTML = entries.map(e => `
                     <div class="entry-item">
-                        <div class="category">${e.category}</div>
+                        <div class="category">${e.category}${e.recurring ? ' <span title="Automatisch aus festen Kosten">🔁</span>' : ''}</div>
                         <div class="date">${e.date}</div>
                         <div class="amount ${e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? 'positive' : 'negative'}">
                             ${(e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? '+' : '-')}${e.amount.toFixed(2)}€
@@ -2057,9 +2152,45 @@
                 return opportunities;
             },
 
+            getOverspendingAlerts() {
+                const currentKey = app.getMonthKey();
+                const { byCategory } = this.getStats();
+                const alerts = [];
+
+                Object.entries(byCategory).forEach(([cat, data]) => {
+                    if (cat.includes('💵') || cat.includes('💰') || cat.includes('📈')) return;
+
+                    let historicalTotal = 0;
+                    let monthCount = 0;
+                    Object.keys(app.data).forEach(key => {
+                        if (key === currentKey) return;
+                        const entries = app.data[key] || [];
+                        const catTotal = entries.filter(e => e.category === cat).reduce((sum, e) => sum + e.amount, 0);
+                        if (catTotal > 0) {
+                            historicalTotal += catTotal;
+                            monthCount++;
+                        }
+                    });
+
+                    if (monthCount < 1) return;
+                    const average = historicalTotal / monthCount;
+                    const diff = data.total - average;
+
+                    if (average > 5 && diff > average * 0.25 && diff > 5) {
+                        const { icon, label } = app.splitCategory(cat);
+                        const percent = Math.round((diff / average) * 100);
+                        alerts.push(`⚠️ ${icon} <strong>${label}</strong>: Diesen Monat ${data.total.toFixed(2)}€ statt sonst durchschnittlich ${average.toFixed(2)}€ – das sind <strong>${percent}% mehr</strong> als üblich.`);
+                    }
+                });
+
+                return alerts;
+            },
+
             findInsights() {
                 const { income, expenses, balance } = this.getStats();
                 const tips = [];
+
+                tips.push(...this.getOverspendingAlerts());
 
                 const opportunities = this.getSavingsOpportunities();
                 opportunities.slice(0, 3).forEach(opp => {
