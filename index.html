@@ -1045,6 +1045,11 @@
                         <input type="text" inputmode="decimal" id="monthlyGoal" placeholder="Monatliches Sparziel (€)">
                         <button onclick="app.setMonthlyGoal()">Speichern</button>
                     </div>
+                    <div class="goal-input-group">
+                        <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Notgroschen-Ziel (€)">
+                        <button onclick="app.setNotgroschenTarget()">Speichern</button>
+                    </div>
+                    <p class="hint-text hint-small" style="margin-top: 8px;">💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.</p>
                 </div>
 
                 <div class="progress-item" id="savingsProgress" style="display: none;">
@@ -1187,6 +1192,9 @@
                 });
                 document.getElementById('monthlyGoal').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.setMonthlyGoal();
+                });
+                document.getElementById('notgroschenTarget').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.setNotgroschenTarget();
                 });
                 document.getElementById('cancelledAmount').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addCancelledCost();
@@ -1657,6 +1665,16 @@
                 }
             },
 
+            setNotgroschenTarget() {
+                const input = document.getElementById('notgroschenTarget');
+                const value = this.parseAmount(input.value);
+                if (value >= 0) {
+                    this.settings.notgroschenTarget = value;
+                    this.saveSettings();
+                    this.render();
+                }
+            },
+
             render() {
                 this.renderMonthSelector();
                 this.renderCategories();
@@ -1723,6 +1741,7 @@
 
                 progressSection.style.display = 'block';
                 document.getElementById('monthlyGoal').value = goal > 0 ? goal : '';
+                document.getElementById('notgroschenTarget').value = this.settings.notgroschenTarget > 0 ? this.settings.notgroschenTarget : '';
 
                 if (goal > 0) {
                     const saved = Math.max(0, balance);
@@ -1892,8 +1911,14 @@
             getNotgroschenStatus() {
                 const fund = this.getEmergencyFund();
                 const avgExpenses = this.getAvgMonthlyExpenses();
-                const target = avgExpenses * 3;
+                const customTarget = app.settings.notgroschenTarget;
+                const target = (customTarget !== undefined && customTarget !== null && customTarget > 0) ? customTarget : avgExpenses * 3;
                 return { fund, target, reached: target > 0 ? fund >= target : false, missing: Math.max(0, target - fund) };
+            },
+
+            getNotgroschenLabel() {
+                const customTarget = app.settings.notgroschenTarget;
+                return (customTarget !== undefined && customTarget !== null && customTarget > 0) ? 'dein persönliches Ziel' : 'ca. 3 Monatsausgaben';
             },
 
             getGreeting() {
@@ -1927,7 +1952,7 @@
                 let msg = `🎉 Zeit für deine Sparrate! Du hast gerade <strong>${amount.toFixed(2)}€</strong> als Gehalt/Rente eingetragen.<br><br>`;
 
                 if (!notgroschen.reached && notgroschen.target > 0) {
-                    msg += `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (ca. 3 Monatsausgaben = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
+                    msg += `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
                 } else if (suggested > 0) {
                     msg += `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Notgroschen steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
                 } else {
@@ -2085,9 +2110,9 @@
                         return 'Dazu brauch ich ein bisschen mehr Daten von dir. Trag über ein paar Monate deine Ausgaben ein, dann kann ich dir sagen, wie groß dein Notgroschen sein sollte! 📝';
                     }
                     if (notgroschen.reached) {
-                        return `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ca. 3 Monatsausgaben). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
+                        return `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
                     }
-                    return `🛡️ Ein Notgroschen sollte etwa <strong>3 Monatsausgaben</strong> abdecken – bei dir wären das ca. <strong>${notgroschen.target.toFixed(2)}€</strong>. Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht!`;
+                    return `🛡️ Dein Notgroschen-Ziel liegt bei <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht! Du kannst das Ziel übrigens jederzeit bei "Sparfortschritt & Budget" selbst anpassen.`;
                 }
 
                 if (q.includes('sparrate') || q.includes('wie viel') && q.includes('spar')) {
@@ -2117,7 +2142,7 @@
                     const suggested = this.getSuggestedSavingsRate();
 
                     if (!notgroschen.reached && notgroschen.target > 0) {
-                        return `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (ca. 3 Monatsausgaben = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
+                        return `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
                     }
 
                     let msg = `📈 Dein Notgroschen steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
