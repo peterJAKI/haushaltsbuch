@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#17a2b8" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light dark">
     <meta name="description" content="Deine Einnahmen und Ausgaben im Überblick">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,6 +15,7 @@
     <title>Haushaltsbuch</title>
     <style>
         :root {
+            color-scheme: light dark;
             --bg-page-1: #e0f7f6;
             --bg-page-2: #e0f4ff;
             --bg-container: #ffffff;
@@ -481,6 +483,116 @@
 
         .goal-input-group button:hover {
             background: var(--accent-dark);
+        }
+
+        .cancelled-section {
+            background: var(--bg-surface);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .cancelled-input-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cancelled-input-group input[type="text"] {
+            flex: 2;
+            min-width: 120px;
+        }
+
+        .cancelled-input-group input[type="number"] {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .cancelled-input-group input,
+        .cancelled-input-group select {
+            padding: 10px 12px;
+            border: 2px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .cancelled-input-group input:focus,
+        .cancelled-input-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .cancelled-input-group button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border: none;
+            border-radius: 6px;
+            color: #2b2b1a;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancelled-input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .cancelled-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cancelled-summary-item {
+            background: var(--bg-container);
+            border-left: 4px solid var(--success);
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cancelled-summary-item span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cancelled-summary-item strong {
+            font-size: 20px;
+            color: var(--success);
+        }
+
+        .cancelled-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-lighter);
+            font-size: 13px;
+        }
+
+        .cancelled-item:last-child {
+            border-bottom: none;
+        }
+
+        .cancelled-item .cancelled-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cancelled-item .cancelled-detail {
+            color: var(--text-muted);
+            font-size: 11px;
         }
 
         .compare-section {
@@ -959,6 +1071,34 @@
                 </div>
             </div>
 
+            <div class="cancelled-section">
+                <h2 class="section-title">❌ Gekündigte Kosten</h2>
+                <p class="hint-text">Was hast du gekündigt oder abbestellt, um Geld zu sparen?</p>
+
+                <div class="cancelled-input-group">
+                    <input type="text" id="cancelledName" placeholder="z.B. ADAC">
+                    <input type="number" id="cancelledAmount" placeholder="Betrag (€)" min="0" step="0.01">
+                    <select id="cancelledPeriod">
+                        <option value="jahr">pro Jahr</option>
+                        <option value="monat">pro Monat</option>
+                    </select>
+                    <button onclick="app.addCancelledCost()">Hinzufügen</button>
+                </div>
+
+                <div class="cancelled-summary" id="cancelledSummary" style="display: none;">
+                    <div class="cancelled-summary-item">
+                        <span>Gespart pro Monat</span>
+                        <strong id="cancelledMonthly">0.00€</strong>
+                    </div>
+                    <div class="cancelled-summary-item">
+                        <span>Gespart pro Jahr</span>
+                        <strong id="cancelledYearly">0.00€</strong>
+                    </div>
+                </div>
+
+                <div id="cancelledList"></div>
+            </div>
+
             <div class="compare-section" id="compareSection" style="display: none;">
                 <h2 class="section-title">📊 Monatsvergleich</h2>
                 <div id="compareChart"></div>
@@ -1033,17 +1173,23 @@
             currentDate: new Date(),
             settings: {},
             customCategories: [],
+            cancelledCosts: [],
 
             init() {
                 this.loadData();
                 this.loadSettings();
                 this.loadCustomCategories();
+                this.loadCancelledCosts();
                 this.render();
+                this.renderCancelledCosts();
                 document.getElementById('amount').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addEntry();
                 });
                 document.getElementById('monthlyGoal').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.setMonthlyGoal();
+                });
+                document.getElementById('cancelledAmount').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addCancelledCost();
                 });
             },
 
@@ -1299,6 +1445,89 @@
             loadCustomCategories() {
                 const stored = localStorage.getItem('haushaltsbuch-custom-categories');
                 this.customCategories = stored ? JSON.parse(stored) : [];
+            },
+
+            loadCancelledCosts() {
+                const stored = localStorage.getItem('haushaltsbuch-cancelled-costs');
+                this.cancelledCosts = stored ? JSON.parse(stored) : [];
+            },
+
+            saveCancelledCosts() {
+                localStorage.setItem('haushaltsbuch-cancelled-costs', JSON.stringify(this.cancelledCosts));
+            },
+
+            addCancelledCost() {
+                const nameInput = document.getElementById('cancelledName');
+                const amountInput = document.getElementById('cancelledAmount');
+                const periodSelect = document.getElementById('cancelledPeriod');
+
+                const name = nameInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                const period = periodSelect.value;
+
+                if (!name || !amount || amount <= 0) {
+                    alert('Bitte gib einen Namen und einen Betrag ein');
+                    return;
+                }
+
+                this.cancelledCosts.push({
+                    id: Date.now(),
+                    name,
+                    amount,
+                    period,
+                    date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                });
+
+                this.saveCancelledCosts();
+                nameInput.value = '';
+                amountInput.value = '';
+                this.renderCancelledCosts();
+
+                if (typeof hugo !== 'undefined') {
+                    hugo.celebrateCancellation(name, period === 'jahr' ? amount / 12 : amount);
+                }
+            },
+
+            deleteCancelledCost(id) {
+                this.cancelledCosts = this.cancelledCosts.filter(c => c.id !== id);
+                this.saveCancelledCosts();
+                this.renderCancelledCosts();
+            },
+
+            renderCancelledCosts() {
+                const list = document.getElementById('cancelledList');
+                const summary = document.getElementById('cancelledSummary');
+
+                if (this.cancelledCosts.length === 0) {
+                    summary.style.display = 'none';
+                    list.innerHTML = '<p class="hint-text hint-small">Noch nichts gekündigt eingetragen.</p>';
+                    return;
+                }
+
+                let totalMonthly = 0;
+                this.cancelledCosts.forEach(c => {
+                    totalMonthly += c.period === 'jahr' ? c.amount / 12 : c.amount;
+                });
+                const totalYearly = totalMonthly * 12;
+
+                summary.style.display = 'grid';
+                document.getElementById('cancelledMonthly').textContent = totalMonthly.toFixed(2) + '€';
+                document.getElementById('cancelledYearly').textContent = totalYearly.toFixed(2) + '€';
+
+                const sorted = [...this.cancelledCosts].sort((a, b) => b.id - a.id);
+                list.innerHTML = sorted.map(c => {
+                    const periodLabel = c.period === 'jahr' ? 'Jahr' : 'Monat';
+                    const monthlyEquivalent = c.period === 'jahr' ? c.amount / 12 : c.amount;
+                    return `
+                        <div class="cancelled-item">
+                            <div>
+                                <div class="cancelled-name">✅ ${c.name}</div>
+                                <div class="cancelled-detail">${c.amount.toFixed(2)}€/${periodLabel} entspricht ${monthlyEquivalent.toFixed(2)}€/Monat · gekündigt am ${c.date}</div>
+                            </div>
+                            <button class="remove-btn" onclick="app.deleteCancelledCost(${c.id})">✕</button>
+                        </div>
+                    `;
+                }).join('');
             },
 
             saveCustomCategories() {
@@ -1703,24 +1932,110 @@
                 this.addMessage(msg, 'hugo');
             },
 
+            celebrateCancellation(name, monthlyAmount) {
+                const container = document.getElementById('hugoContainer');
+                const btn = document.getElementById('hugoToggleBtn');
+                this.opened = true;
+                container.classList.remove('hidden');
+                btn.classList.add('hidden');
+
+                if (!this.greeted) {
+                    this.greeted = true;
+                    this.addMessage(this.getGreeting(), 'hugo');
+                }
+
+                let totalMonthly = 0;
+                app.cancelledCosts.forEach(c => {
+                    totalMonthly += c.period === 'jahr' ? c.amount / 12 : c.amount;
+                });
+                const totalYearly = totalMonthly * 12;
+
+                const msg = `🎉 Stark! <strong>${name}</strong> gekündigt spart dir <strong>${monthlyAmount.toFixed(2)}€/Monat</strong>.<br><br>` +
+                    `Insgesamt hast du bisher <strong>${app.cancelledCosts.length} Kündigung${app.cancelledCosts.length === 1 ? '' : 'en'}</strong> eingetragen – zusammen <strong>${totalMonthly.toFixed(2)}€/Monat</strong> = <strong>${totalYearly.toFixed(2)}€/Jahr</strong> gespart! 💪 Leg das doch direkt in deine Sparrate mit ein.`;
+
+                this.addMessage(msg, 'hugo');
+            },
+
+            getReductionRate(cat) {
+                const rates = {
+                    '🏠 Miete': 0,
+                    '⚡ Strom': 0.08,
+                    '📺 Abo': 0.40,
+                    '🍽️ Essen gehen': 0.30,
+                    '🎬 Unterhaltung': 0.25,
+                    '👗 Kleidung': 0.20,
+                    '💇 Friseur': 0.15,
+                    '📱 Telefon': 0.15,
+                    '🚑 Unfallversicherung': 0.15,
+                    '🛡️ Haftpflichtversicherung': 0.15,
+                    '🛋️ Hausratversicherung': 0.15,
+                    '🕊️ Sterbeversicherung': 0.15,
+                    '⚖️ Rechtsschutzversicherung': 0.15,
+                    '🛒 Lebensmittel': 0.10,
+                    '⛽ Tanken': 0.10,
+                    '🚗 Auto': 0.10,
+                    '💊 Apotheke': 0.05
+                };
+                return rates[cat] !== undefined ? rates[cat] : 0.08;
+            },
+
+            getSavingsAdvice(cat) {
+                const advice = {
+                    '⚡ Strom': 'Ein Stromanbieter-Vergleich einmal im Jahr kann bares Geld sparen.',
+                    '📺 Abo': 'Prüf, ob du wirklich alle Abos noch nutzt – oft läuft da unbemerkt was mit.',
+                    '🍽️ Essen gehen': 'Ein, zwei Mal weniger im Monat auswärts essen macht schon einen spürbaren Unterschied.',
+                    '🎬 Unterhaltung': 'Schau, ob es günstigere Alternativen gibt, statt alles einzeln zu buchen.',
+                    '👗 Kleidung': 'Sale-Zeiten oder Second Hand sparen oft die Hälfte.',
+                    '💇 Friseur': 'Etwas seltener zum Friseur oder ein günstigerer Salon kann sich lohnen.',
+                    '📱 Telefon': 'Ein Tarifvergleich einmal im Jahr lohnt sich fast immer.',
+                    '🚑 Unfallversicherung': 'Ein Versicherungsvergleich einmal im Jahr lohnt sich meistens.',
+                    '🛡️ Haftpflichtversicherung': 'Ein Versicherungsvergleich einmal im Jahr lohnt sich meistens.',
+                    '🛋️ Hausratversicherung': 'Ein Versicherungsvergleich einmal im Jahr lohnt sich meistens.',
+                    '🕊️ Sterbeversicherung': 'Ein Versicherungsvergleich einmal im Jahr lohnt sich meistens.',
+                    '⚖️ Rechtsschutzversicherung': 'Ein Versicherungsvergleich einmal im Jahr lohnt sich meistens.',
+                    '🛒 Lebensmittel': 'Ein Wochenplan und Angebote nutzen bringt oft ein paar Euro extra.',
+                    '⛽ Tanken': 'Preisvergleichs-Apps können ein paar Cent pro Liter sparen.',
+                    '🚗 Auto': 'Prüf, ob Werkstattkosten oder Zubehör woanders günstiger wären.',
+                    '💊 Apotheke': 'Bei Dauermedikamenten lohnt sich manchmal ein Generika-Check beim Arzt.'
+                };
+                return advice[cat] || 'Hier steckt noch ungenutztes Sparpotenzial.';
+            },
+
+            getSavingsOpportunities() {
+                const { byCategory } = this.getStats();
+                const opportunities = [];
+
+                Object.entries(byCategory).forEach(([cat, data]) => {
+                    if (cat.includes('💵') || cat.includes('💰') || cat.includes('📈')) return;
+
+                    const rate = this.getReductionRate(cat);
+                    const monthlySavings = data.total * rate;
+                    if (monthlySavings < 3) return;
+
+                    opportunities.push({
+                        category: cat,
+                        total: data.total,
+                        count: data.count,
+                        rate,
+                        monthlySavings,
+                        yearlySavings: monthlySavings * 12,
+                        advice: this.getSavingsAdvice(cat)
+                    });
+                });
+
+                opportunities.sort((a, b) => b.yearlySavings - a.yearlySavings);
+                return opportunities;
+            },
+
             findInsights() {
-                const { income, expenses, balance, byCategory } = this.getStats();
+                const { income, expenses, balance } = this.getStats();
                 const tips = [];
 
-                const abo = byCategory['📺 Abo'];
-                if (abo && abo.count >= 2) {
-                    tips.push(`📺 Du hast <strong>${abo.count} Abo-Einträge</strong> mit zusammen ${abo.total.toFixed(2)}€. Das macht <strong>${(abo.total * 12).toFixed(2)}€ im Jahr</strong>! Schau mal, ob du wirklich alle brauchst – oft läuft da was nebenher mit, das keiner mehr nutzt.`);
-                }
-
-                const essen = byCategory['🍽️ Essen gehen'];
-                if (essen && income > 0 && essen.total > income * 0.1) {
-                    tips.push(`🍽️ Essen gehen hat dich diesen Monat ${essen.total.toFixed(2)}€ gekostet – das sind mehr als 10% deines Einkommens. Ein, zwei Mal weniger im Monat auswärts essen und du sparst locker ${(essen.total * 0.3).toFixed(2)}€!`);
-                }
-
-                const versicherung = byCategory['🛡️ Versicherung'];
-                if (versicherung && versicherung.count >= 2) {
-                    tips.push(`🛡️ Du hast ${versicherung.count} Versicherungs-Einträge. Manchmal zahlt man doppelt für ähnliche Sachen – ein Versicherungsvergleich einmal im Jahr lohnt sich meistens richtig.`);
-                }
+                const opportunities = this.getSavingsOpportunities();
+                opportunities.slice(0, 3).forEach(opp => {
+                    const { icon, label } = app.splitCategory(opp.category);
+                    tips.push(`${icon} Bei <strong>${label}</strong> gibst du ${opp.total.toFixed(2)}€/Monat aus. Realistisch <strong>${(opp.rate * 100).toFixed(0)}% einsparbar</strong> = <strong>${opp.monthlySavings.toFixed(2)}€/Monat</strong> (<strong>${opp.yearlySavings.toFixed(2)}€/Jahr</strong>). ${opp.advice}`);
+                });
 
                 if (balance < 0) {
                     tips.push(`⚠️ Diesen Monat gibst du <strong>${Math.abs(balance).toFixed(2)}€ mehr aus, als reinkommt</strong>. Kein Grund zu Panik, aber schau mal, wo du kleine Schrauben drehen kannst.`);
@@ -1785,7 +2100,9 @@
                 if (q.includes('abo')) {
                     const abo = byCategory['📺 Abo'];
                     if (abo) {
-                        return `📺 Du hast diesen Monat ${abo.count}x Abo-Kosten von insgesamt ${abo.total.toFixed(2)}€ eingetragen. Hochgerechnet aufs Jahr sind das <strong>${(abo.total * 12).toFixed(2)}€</strong>! Check mal auf deinem Kontoauszug, welche Abos wirklich noch genutzt werden.`;
+                        const rate = this.getReductionRate('📺 Abo');
+                        const monthlySavings = abo.total * rate;
+                        return `📺 Du hast diesen Monat ${abo.count}x Abo-Kosten von insgesamt ${abo.total.toFixed(2)}€ eingetragen. Hochgerechnet aufs Jahr sind das <strong>${(abo.total * 12).toFixed(2)}€</strong>! Wenn du ${(rate * 100).toFixed(0)}% davon kündigst, sparst du <strong>${monthlySavings.toFixed(2)}€/Monat</strong> = <strong>${(monthlySavings * 12).toFixed(2)}€/Jahr</strong>. Check mal auf deinem Kontoauszug, welche Abos wirklich noch genutzt werden.`;
                     }
                     return 'Ich seh diesen Monat keine Abo-Einträge bei dir. Wenn du welche hast, trag sie mal ein, dann schau ich sie mir an! 👍';
                 }
