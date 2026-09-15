@@ -191,6 +191,7 @@
         }
 
         .category-btn {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -205,6 +206,23 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
+        }
+
+        .cat-done {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .category-btn .cat-icon {
@@ -1240,6 +1258,7 @@
             hugoInputPlaceholder: { de: 'Frag Hugo etwas...', en: 'Ask Hugo something...' },
             hugoSendBtn: { de: 'Senden', en: 'Send' },
             addCategoryLabel: { de: 'Kategorie', en: 'Category' },
+            alreadyEntered: { de: 'Schon diesen Monat eingetragen', en: 'Already entered this month' },
             noEntries: { de: 'Noch keine Einträge für diesen Monat', en: 'No entries yet this month' },
             noCancelled: { de: 'Noch nichts gekündigt eingetragen.', en: 'Nothing cancelled yet.' },
             compareThis: { de: 'Diesen', en: 'This' },
@@ -1977,9 +1996,11 @@
             renderCategories() {
                 const container = document.getElementById('categories');
                 const allCategories = [...CATEGORIES, ...this.customCategories];
+                const usedCategories = new Set(this.getMonthData().map(e => e.category));
                 container.innerHTML = allCategories.map(cat => {
                     const { icon, label } = this.splitCategory(cat);
-                    return `<button class="category-btn" data-category="${cat}" onclick="app.selectCategory(this)"><span class="cat-icon">${icon}</span><span class="cat-label">${label}</span></button>`;
+                    const usedBadge = usedCategories.has(cat) ? '<span class="cat-done" title="' + this.t('alreadyEntered') + '">✓</span>' : '';
+                    return `<button class="category-btn" data-category="${cat}" onclick="app.selectCategory(this)">${usedBadge}<span class="cat-icon">${icon}</span><span class="cat-label">${label}</span></button>`;
                 }).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()"><span class="cat-icon">➕</span><span class="cat-label">${this.t('addCategoryLabel')}</span></button>`;
             },
 
