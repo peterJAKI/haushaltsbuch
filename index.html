@@ -125,6 +125,32 @@
             color: white;
             padding: 30px 20px;
             text-align: center;
+            position: relative;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .lang-btn {
+            padding: 4px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: var(--accent-dark);
         }
 
         header h1 {
@@ -1024,60 +1050,64 @@
 <body>
     <div class="container">
         <header>
+            <div class="lang-switch">
+                <button id="langDe" class="lang-btn active" onclick="app.setLang('de')">DE</button>
+                <button id="langEn" class="lang-btn" onclick="app.setLang('en')">EN</button>
+            </div>
             <h1>📊 Haushaltsbuch</h1>
-            <p>Deine Einnahmen und Ausgaben im Überblick</p>
+            <p data-i18n="appSubtitle">Deine Einnahmen und Ausgaben im Überblick</p>
         </header>
 
         <div class="content">
             <div class="month-selector">
-                <button onclick="app.previousMonth()">← Vorheriger</button>
+                <button onclick="app.previousMonth()" data-i18n="prevMonth">← Vorheriger</button>
                 <span id="currentMonth"></span>
-                <button onclick="app.nextMonth()">Nächster →</button>
+                <button onclick="app.nextMonth()" data-i18n="nextMonth">Nächster →</button>
             </div>
 
             <div class="entry-section">
-                <h2>📝 Neuer Eintrag</h2>
-                <p class="hint-text">Kategorie wählen:</p>
+                <h2 data-i18n="newEntryTitle">📝 Neuer Eintrag</h2>
+                <p class="hint-text" data-i18n="chooseCategory">Kategorie wählen:</p>
                 <div class="categories-grid" id="categories"></div>
 
                 <div class="categories-footer">
-                    <button class="link-btn" onclick="app.manageCategories()">⚙️ Kategorien verwalten</button>
+                    <button class="link-btn" onclick="app.manageCategories()" data-i18n="manageCategoriesBtn">⚙️ Kategorien verwalten</button>
                 </div>
 
                 <div class="input-group">
-                    <input type="text" inputmode="decimal" id="amount" placeholder="Summe eingeben">
-                    <button onclick="app.addEntry()">Hinzufügen</button>
+                    <input type="text" inputmode="decimal" id="amount" placeholder="Summe eingeben" data-i18n-ph="amountPlaceholder">
+                    <button onclick="app.addEntry()" data-i18n="addBtn">Hinzufügen</button>
                 </div>
 
                 <label class="recurring-check">
                     <input type="checkbox" id="markRecurring">
-                    🔁 Als feste Kosten merken (wird jeden Monat automatisch eingetragen)
+                    <span data-i18n="recurringCheckLabel">🔁 Als feste Kosten merken (wird jeden Monat automatisch eingetragen)</span>
                 </label>
 
-                <p class="hint-text hint-small">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
-                <p class="hint-text hint-small"><button class="link-btn" onclick="app.manageRecurringCosts()">🔁 Feste Kosten verwalten</button></p>
+                <p class="hint-text hint-small" data-i18n="amountHint">💡 Tippe einfach die Summe ein und klick "Hinzufügen"</p>
+                <p class="hint-text hint-small"><button class="link-btn" onclick="app.manageRecurringCosts()" data-i18n="manageRecurringBtn">🔁 Feste Kosten verwalten</button></p>
             </div>
 
             <div class="summary" id="summary"></div>
 
             <div class="progress-section" id="progressSection" style="display: none;">
-                <h2 class="section-title">🎯 Sparfortschritt & Budget</h2>
+                <h2 class="section-title" data-i18n="progressTitle">🎯 Sparfortschritt & Budget</h2>
 
                 <div class="goal-input-wrapper">
                     <div class="goal-input-group">
-                        <input type="text" inputmode="decimal" id="monthlyGoal" placeholder="Monatliches Sparziel (€)">
-                        <button onclick="app.setMonthlyGoal()">Speichern</button>
+                        <input type="text" inputmode="decimal" id="monthlyGoal" placeholder="Monatliches Sparziel (€)" data-i18n-ph="monthlyGoalPlaceholder">
+                        <button onclick="app.setMonthlyGoal()" data-i18n="saveBtn">Speichern</button>
                     </div>
                     <div class="goal-input-group">
-                        <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Notgroschen-Ziel (€)">
-                        <button onclick="app.setNotgroschenTarget()">Speichern</button>
+                        <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Notgroschen-Ziel (€)" data-i18n-ph="notgroschenPlaceholder">
+                        <button onclick="app.setNotgroschenTarget()" data-i18n="saveBtn">Speichern</button>
                     </div>
-                    <p class="hint-text hint-small" style="margin-top: 8px;">💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.</p>
+                    <p class="hint-text hint-small" style="margin-top: 8px;" data-i18n="notgroschenHint">💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.</p>
                 </div>
 
                 <div class="progress-item" id="savingsProgress" style="display: none;">
                     <div class="progress-label">
-                        <span>💰 Sparziel</span>
+                        <span data-i18n="savingsGoalLabel">💰 Sparziel</span>
                         <span id="savingsPercent">0%</span>
                     </div>
                     <div class="progress-bar">
@@ -1090,7 +1120,7 @@
 
                 <div class="progress-item">
                     <div class="progress-label">
-                        <span>📅 Tagesbudget</span>
+                        <span data-i18n="dailyBudgetLabel">📅 Tagesbudget</span>
                         <span id="budgetStatus" class="status-ok">-</span>
                     </div>
                     <div class="hint-text">
@@ -1100,26 +1130,26 @@
             </div>
 
             <div class="cancelled-section">
-                <h2 class="section-title">❌ Gekündigte Kosten</h2>
-                <p class="hint-text">Was hast du gekündigt oder abbestellt, um Geld zu sparen?</p>
+                <h2 class="section-title" data-i18n="cancelledTitle">❌ Gekündigte Kosten</h2>
+                <p class="hint-text" data-i18n="cancelledSubtitle">Was hast du gekündigt oder abbestellt, um Geld zu sparen?</p>
 
                 <div class="cancelled-input-group">
-                    <input type="text" id="cancelledName" placeholder="z.B. ADAC">
-                    <input type="text" inputmode="decimal" id="cancelledAmount" placeholder="Betrag (€)">
+                    <input type="text" id="cancelledName" placeholder="z.B. ADAC" data-i18n-ph="cancelledNamePlaceholder">
+                    <input type="text" inputmode="decimal" id="cancelledAmount" placeholder="Betrag (€)" data-i18n-ph="cancelledAmountPlaceholder">
                     <select id="cancelledPeriod">
-                        <option value="jahr">pro Jahr</option>
-                        <option value="monat">pro Monat</option>
+                        <option value="jahr" data-i18n="perYear">pro Jahr</option>
+                        <option value="monat" data-i18n="perMonth">pro Monat</option>
                     </select>
-                    <button onclick="app.addCancelledCost()">Hinzufügen</button>
+                    <button onclick="app.addCancelledCost()" data-i18n="addBtn">Hinzufügen</button>
                 </div>
 
                 <div class="cancelled-summary" id="cancelledSummary" style="display: none;">
                     <div class="cancelled-summary-item">
-                        <span>Gespart pro Monat</span>
+                        <span data-i18n="savedPerMonth">Gespart pro Monat</span>
                         <strong id="cancelledMonthly">0.00€</strong>
                     </div>
                     <div class="cancelled-summary-item">
-                        <span>Gespart pro Jahr</span>
+                        <span data-i18n="savedPerYear">Gespart pro Jahr</span>
                         <strong id="cancelledYearly">0.00€</strong>
                     </div>
                 </div>
@@ -1128,20 +1158,20 @@
             </div>
 
             <div class="compare-section" id="compareSection" style="display: none;">
-                <h2 class="section-title">📊 Monatsvergleich</h2>
+                <h2 class="section-title" data-i18n="compareTitle">📊 Monatsvergleich</h2>
                 <div id="compareChart"></div>
             </div>
 
             <div class="entries-section">
-                <h2>📋 Einträge</h2>
+                <h2 data-i18n="entriesTitle">📋 Einträge</h2>
                 <div id="entries"></div>
             </div>
 
             <div class="actions">
-                <button class="action-btn" onclick="app.exportData()">💾 Daten exportieren</button>
-                <button class="action-btn" onclick="app.importData()">📂 Daten importieren</button>
-                <button class="action-btn" onclick="app.showYearReview()">📅 Jahresrückblick</button>
-                <button class="action-btn action-btn-danger" onclick="app.clearMonth()">🗑️ Monat löschen</button>
+                <button class="action-btn" onclick="app.exportData()" data-i18n="exportBtn">💾 Daten exportieren</button>
+                <button class="action-btn" onclick="app.importData()" data-i18n="importBtn">📂 Daten importieren</button>
+                <button class="action-btn" onclick="app.showYearReview()" data-i18n="yearReviewBtn">📅 Jahresrückblick</button>
+                <button class="action-btn action-btn-danger" onclick="app.clearMonth()" data-i18n="deleteMonthBtn">🗑️ Monat löschen</button>
             </div>
         </div>
     </div>
@@ -1149,7 +1179,7 @@
     <div class="year-review-overlay hidden" id="yearReviewOverlay" onclick="if(event.target===this) app.closeYearReview()">
         <div class="year-review-modal">
             <div class="year-review-header">
-                <span>📅 Jahresrückblick</span>
+                <span data-i18n="yearReviewBtn">📅 Jahresrückblick</span>
                 <button class="hugo-close" onclick="app.closeYearReview()">✕</button>
             </div>
             <div class="year-review-body" id="yearReviewBody"></div>
@@ -1162,17 +1192,112 @@
 
     <div class="hugo-container hidden" id="hugoContainer">
         <div class="hugo-header">
-            <span>🧑‍💼 Hugo – dein Spar-Berater</span>
+            <span data-i18n="hugoHeaderTitle">🧑‍💼 Hugo – dein Spar-Berater</span>
             <button class="hugo-close" onclick="hugo.toggle()">✕</button>
         </div>
         <div class="hugo-messages" id="hugoMessages"></div>
         <div class="hugo-input">
-            <input type="text" id="hugoInput" placeholder="Frag Hugo etwas...">
-            <button onclick="hugo.send()">Senden</button>
+            <input type="text" id="hugoInput" placeholder="Frag Hugo etwas..." data-i18n-ph="hugoInputPlaceholder">
+            <button onclick="hugo.send()" data-i18n="hugoSendBtn">Senden</button>
         </div>
     </div>
 
     <script>
+        const TRANSLATIONS = {
+            appSubtitle: { de: 'Deine Einnahmen und Ausgaben im Überblick', en: 'Your income and expenses at a glance' },
+            prevMonth: { de: '← Vorheriger', en: '← Previous' },
+            nextMonth: { de: 'Nächster →', en: 'Next →' },
+            newEntryTitle: { de: '📝 Neuer Eintrag', en: '📝 New Entry' },
+            chooseCategory: { de: 'Kategorie wählen:', en: 'Choose category:' },
+            manageCategoriesBtn: { de: '⚙️ Kategorien verwalten', en: '⚙️ Manage categories' },
+            amountPlaceholder: { de: 'Summe eingeben', en: 'Enter amount' },
+            addBtn: { de: 'Hinzufügen', en: 'Add' },
+            recurringCheckLabel: { de: '🔁 Als feste Kosten merken (wird jeden Monat automatisch eingetragen)', en: '🔁 Remember as fixed cost (added automatically every month)' },
+            amountHint: { de: '💡 Tippe einfach die Summe ein und klick "Hinzufügen"', en: '💡 Just type the amount and click "Add"' },
+            manageRecurringBtn: { de: '🔁 Feste Kosten verwalten', en: '🔁 Manage fixed costs' },
+            progressTitle: { de: '🎯 Sparfortschritt & Budget', en: '🎯 Savings Progress & Budget' },
+            monthlyGoalPlaceholder: { de: 'Monatliches Sparziel (€)', en: 'Monthly savings goal (€)' },
+            saveBtn: { de: 'Speichern', en: 'Save' },
+            notgroschenPlaceholder: { de: 'Dein eigenes Notgroschen-Ziel (€)', en: 'Your own emergency fund goal (€)' },
+            notgroschenHint: { de: '💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.', en: "💡 Without your own input, Hugo automatically calculates 3 months of expenses — set what's realistic for you here." },
+            savingsGoalLabel: { de: '💰 Sparziel', en: '💰 Savings goal' },
+            dailyBudgetLabel: { de: '📅 Tagesbudget', en: '📅 Daily budget' },
+            cancelledTitle: { de: '❌ Gekündigte Kosten', en: '❌ Cancelled Costs' },
+            cancelledSubtitle: { de: 'Was hast du gekündigt oder abbestellt, um Geld zu sparen?', en: 'What did you cancel to save money?' },
+            cancelledNamePlaceholder: { de: 'z.B. ADAC', en: 'e.g. Gym membership' },
+            cancelledAmountPlaceholder: { de: 'Betrag (€)', en: 'Amount (€)' },
+            perYear: { de: 'pro Jahr', en: 'per year' },
+            perMonth: { de: 'pro Monat', en: 'per month' },
+            savedPerMonth: { de: 'Gespart pro Monat', en: 'Saved per month' },
+            savedPerYear: { de: 'Gespart pro Jahr', en: 'Saved per year' },
+            compareTitle: { de: '📊 Monatsvergleich', en: '📊 Month Comparison' },
+            entriesTitle: { de: '📋 Einträge', en: '📋 Entries' },
+            exportBtn: { de: '💾 Daten exportieren', en: '💾 Export data' },
+            importBtn: { de: '📂 Daten importieren', en: '📂 Import data' },
+            yearReviewBtn: { de: '📅 Jahresrückblick', en: '📅 Year in Review' },
+            deleteMonthBtn: { de: '🗑️ Monat löschen', en: '🗑️ Delete month' },
+            hugoHeaderTitle: { de: '🧑‍💼 Hugo – dein Spar-Berater', en: '🧑‍💼 Hugo – your savings advisor' },
+            hugoInputPlaceholder: { de: 'Frag Hugo etwas...', en: 'Ask Hugo something...' },
+            hugoSendBtn: { de: 'Senden', en: 'Send' },
+            addCategoryLabel: { de: 'Kategorie', en: 'Category' },
+            noEntries: { de: 'Noch keine Einträge für diesen Monat', en: 'No entries yet this month' },
+            noCancelled: { de: 'Noch nichts gekündigt eingetragen.', en: 'Nothing cancelled yet.' },
+            compareThis: { de: 'Diesen', en: 'This' },
+            compareLast: { de: 'Letzten', en: 'Last' },
+            compareEqual: { de: 'gleich', en: 'equal' },
+            yrIncome: { de: 'Einnahmen', en: 'Income' },
+            incomeLabel: { de: 'Einnahmen (Gehalt/Rente)', en: 'Income (Salary/Pension)' },
+            balanceLabel: { de: 'Bilanz', en: 'Balance' },
+            yearWord: { de: 'Jahr', en: 'year' },
+            monthWord: { de: 'Monat', en: 'month' },
+            statusOk: { de: '✓ OK', en: '✓ OK' },
+            statusOverBudget: { de: '⚠ Über Budget', en: '⚠ Over budget' },
+            yrExpenses: { de: 'Ausgaben', en: 'Expenses' },
+            yrTotalSaved: { de: 'Gespart insgesamt', en: 'Total saved' },
+            yrTopCategory: { de: 'Größte Ausgabe-Kategorie', en: 'Biggest expense category' },
+            yrBestMonth: { de: 'Bester Monat', en: 'Best month' },
+            yrWorstMonth: { de: 'Schwierigster Monat', en: 'Hardest month' },
+            yrEmpty: { de: 'Noch keine Daten für dieses Jahr vorhanden. Trag ein paar Einträge ein, dann gibt es hier am Jahresende eine schöne Übersicht! 📊', en: 'No data for this year yet. Add a few entries, and you\'ll get a nice overview here at year-end! 📊' },
+            manageCategoriesHeader: { de: '⚙️ Eigene Kategorien', en: '⚙️ Custom Categories' },
+            noCustomCategories: { de: 'Du hast noch keine eigenen Kategorien hinzugefügt. Klick auf "+ Kategorie" unter der Liste, um eine anzulegen.', en: 'You haven\'t added any custom categories yet. Click "+ Category" below the list to create one.' },
+            removeBtn: { de: '✕ Entfernen', en: '✕ Remove' },
+            manageRecurringHeader: { de: '🔁 Feste Kosten', en: '🔁 Fixed Costs' },
+            noRecurringCosts: { de: 'Noch keine festen Kosten hinterlegt. Setz beim nächsten Eintrag den Haken bei "Als feste Kosten merken", dann erscheint er hier und wird ab dem nächsten Monat automatisch eingetragen.', en: 'No fixed costs saved yet. Check "Remember as fixed cost" on your next entry, and it will appear here and be added automatically from next month on.' },
+            perMonthShort: { de: '/Monat', en: '/month' },
+            confirmDeleteMonth: { de: 'Wirklich alle Einträge für {month} löschen?', en: 'Really delete all entries for {month}?' },
+            alertChooseCategory: { de: 'Bitte wähle eine Kategorie und gib eine Summe ein', en: 'Please choose a category and enter an amount' },
+            alertCategoryExists: { de: 'Diese Kategorie gibt es schon!', en: 'This category already exists!' },
+            alertNameAndAmount: { de: 'Bitte gib einen Namen und einen Betrag ein', en: 'Please enter a name and an amount' },
+            alertImportSuccess: { de: 'Daten erfolgreich importiert!', en: 'Data imported successfully!' },
+            alertImportError: { de: 'Fehler beim Importieren: ', en: 'Error importing: ' },
+            promptNewCategory: { de: 'Neue Kategorie hinzufügen.\n\nEinfach den Namen eingeben, z.B. "Mieterschutz" – ein passendes Symbol wird automatisch ausgewählt.', en: 'Add new category.\n\nJust type the name, e.g. "Tenant Insurance" – a fitting icon will be picked automatically.' },
+            recurringNoteAuto: { de: 'Automatisch aus festen Kosten', en: 'Automatically added from fixed costs' },
+            cancelledDetail: { de: '{amount}€/{period} entspricht {monthly}€/Monat · gekündigt am {date}', en: '{amount}€/{period} equals {monthly}€/month · cancelled on {date}' }
+        };
+
+        const CATEGORY_LABEL_TRANSLATIONS = {
+            'Gehalt/Rente': 'Salary/Pension',
+            'Miete': 'Rent',
+            'Strom': 'Electricity',
+            'Unfallversicherung': 'Accident Insurance',
+            'Haftpflichtversicherung': 'Liability Insurance',
+            'Hausratversicherung': 'Home Contents Insurance',
+            'Sterbeversicherung': 'Life/Funeral Insurance',
+            'Rechtsschutzversicherung': 'Legal Insurance',
+            'Abo': 'Subscription',
+            'Essen gehen': 'Eating Out',
+            'Lebensmittel': 'Groceries',
+            'Tanken': 'Fuel',
+            'Auto': 'Car',
+            'Apotheke': 'Pharmacy',
+            'Kleidung': 'Clothing',
+            'Friseur': 'Hairdresser',
+            'Unterhaltung': 'Entertainment',
+            'Telefon': 'Phone',
+            'Sparen': 'Savings',
+            'Investitionen': 'Investments'
+        };
+
         const CATEGORIES = [
             '💵 Gehalt/Rente',
             '🏠 Miete',
@@ -1203,13 +1328,16 @@
             customCategories: [],
             cancelledCosts: [],
             recurringCosts: [],
+            lang: 'de',
 
             init() {
+                this.loadLang();
                 this.loadSettings();
                 this.loadCustomCategories();
                 this.loadCancelledCosts();
                 this.loadRecurringCosts();
                 this.loadData();
+                this.applyLanguage();
                 this.render();
                 this.renderCancelledCosts();
                 document.getElementById('amount').addEventListener('keypress', (e) => {
@@ -1251,7 +1379,7 @@
                                 id: Date.now() + Math.floor(Math.random() * 1000),
                                 category: rc.category,
                                 amount: rc.amount,
-                                date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+                                date: new Date().toLocaleDateString(this.getLocale(), { day: '2-digit', month: '2-digit' }),
                                 recurring: true
                             });
                         });
@@ -1292,7 +1420,7 @@
                 const amount = this.parseAmount(document.getElementById('amount').value);
 
                 if (!selected || !amount || amount <= 0) {
-                    alert('Bitte wähle eine Kategorie und gib eine Summe ein');
+                    alert(this.t('alertChooseCategory'));
                     return;
                 }
 
@@ -1300,7 +1428,7 @@
                     id: Date.now(),
                     category: selected.dataset.category,
                     amount: amount,
-                    date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                    date: new Date().toLocaleDateString(this.getLocale(), { day: '2-digit', month: '2-digit' })
                 };
 
                 this.getMonthData().push(entry);
@@ -1361,7 +1489,7 @@
             },
 
             showYearReview() {
-                document.querySelector('.year-review-header span').textContent = '📅 Jahresrückblick';
+                document.querySelector('.year-review-header span').textContent = this.t('yearReviewBtn');
                 const year = this.currentDate.getFullYear();
                 let totalIncome = 0, totalExpenses = 0;
                 const categoryTotals = {};
@@ -1394,30 +1522,31 @@
 
                 const monthName = (key) => {
                     const [y, m] = key.split('-');
-                    return new Date(y, m - 1, 1).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                    return new Date(y, m - 1, 1).toLocaleDateString(this.getLocale(), { month: 'long', year: 'numeric' });
                 };
 
                 const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
                 const topCategory = sortedCategories[0];
 
                 let html = `
-                    <div class="yr-stat"><span>Einnahmen ${year}</span><strong>+${totalIncome.toFixed(2)}€</strong></div>
-                    <div class="yr-stat"><span>Ausgaben ${year}</span><strong>-${totalExpenses.toFixed(2)}€</strong></div>
-                    <div class="yr-stat"><span>Gespart insgesamt</span><strong>${(totalIncome - totalExpenses >= 0 ? '+' : '')}${(totalIncome - totalExpenses).toFixed(2)}€</strong></div>
+                    <div class="yr-stat"><span>${this.t('yrIncome')} ${year}</span><strong>+${totalIncome.toFixed(2)}€</strong></div>
+                    <div class="yr-stat"><span>${this.t('yrExpenses')} ${year}</span><strong>-${totalExpenses.toFixed(2)}€</strong></div>
+                    <div class="yr-stat"><span>${this.t('yrTotalSaved')}</span><strong>${(totalIncome - totalExpenses >= 0 ? '+' : '')}${(totalIncome - totalExpenses).toFixed(2)}€</strong></div>
                 `;
 
                 if (topCategory) {
-                    html += `<div class="yr-stat"><span>Größte Ausgabe-Kategorie</span><strong>${topCategory[0]}: ${topCategory[1].toFixed(2)}€</strong></div>`;
+                    const { icon, label } = this.splitCategory(topCategory[0]);
+                    html += `<div class="yr-stat"><span>${this.t('yrTopCategory')}</span><strong>${icon} ${label}: ${topCategory[1].toFixed(2)}€</strong></div>`;
                 }
                 if (bestMonth) {
-                    html += `<div class="yr-stat"><span>Bester Monat</span><strong>${monthName(bestMonth.key)}</strong></div>`;
+                    html += `<div class="yr-stat"><span>${this.t('yrBestMonth')}</span><strong>${monthName(bestMonth.key)}</strong></div>`;
                 }
                 if (worstMonth && worstMonth.key !== bestMonth.key) {
-                    html += `<div class="yr-stat"><span>Schwierigster Monat</span><strong>${monthName(worstMonth.key)}</strong></div>`;
+                    html += `<div class="yr-stat"><span>${this.t('yrWorstMonth')}</span><strong>${monthName(worstMonth.key)}</strong></div>`;
                 }
 
                 if (totalIncome === 0 && totalExpenses === 0) {
-                    html = '<p>Noch keine Daten für dieses Jahr vorhanden. Trag ein paar Einträge ein, dann gibt es hier am Jahresende eine schöne Übersicht! 📊</p>';
+                    html = `<p>${this.t('yrEmpty')}</p>`;
                 }
 
                 document.getElementById('yearReviewBody').innerHTML = html;
@@ -1457,22 +1586,23 @@
                     const currWidth = (curr / maxValue * 100).toFixed(1);
                     const prevWidth = (prev / maxValue * 100).toFixed(1);
                     const diff = curr - prev;
-                    const diffText = diff === 0 ? 'gleich' : (diff > 0 ? `+${diff.toFixed(2)}€` : `${diff.toFixed(2)}€`);
+                    const diffText = diff === 0 ? this.t('compareEqual') : (diff > 0 ? `+${diff.toFixed(2)}€` : `${diff.toFixed(2)}€`);
                     const diffClass = diff > 0 ? 'status-warning' : (diff < 0 ? 'status-ok' : '');
+                    const { icon, label } = this.splitCategory(cat);
 
                     return `
                         <div class="compare-row">
                             <div class="compare-label">
-                                <span>${cat}</span>
+                                <span>${icon} ${label}</span>
                                 <span class="${diffClass}">${diffText}</span>
                             </div>
                             <div class="compare-bar-track">
-                                <span class="bar-tag">Diesen</span>
+                                <span class="bar-tag">${this.t('compareThis')}</span>
                                 <div class="compare-bar-bg"><div class="compare-bar-fill current" style="width: ${currWidth}%"></div></div>
                                 <span class="compare-bar-value">${curr.toFixed(2)}€</span>
                             </div>
                             <div class="compare-bar-track">
-                                <span class="bar-tag">Letzten</span>
+                                <span class="bar-tag">${this.t('compareLast')}</span>
                                 <div class="compare-bar-bg"><div class="compare-bar-fill previous" style="width: ${prevWidth}%"></div></div>
                                 <span class="compare-bar-value">${prev.toFixed(2)}€</span>
                             </div>
@@ -1482,7 +1612,7 @@
             },
 
             clearMonth() {
-                if (confirm(`Wirklich alle Einträge für ${this.getMonthKey()} löschen?`)) {
+                if (confirm(this.t('confirmDeleteMonth').replace('{month}', this.getMonthKey()))) {
                     delete this.data[this.getMonthKey()];
                     this.saveData();
                     this.render();
@@ -1501,6 +1631,43 @@
             loadSettings() {
                 const stored = localStorage.getItem('haushaltsbuch-settings');
                 this.settings = stored ? JSON.parse(stored) : { monthlyGoal: 0 };
+            },
+
+            loadLang() {
+                const stored = localStorage.getItem('haushaltsbuch-lang');
+                this.lang = stored === 'en' ? 'en' : 'de';
+            },
+
+            setLang(lang) {
+                this.lang = lang;
+                localStorage.setItem('haushaltsbuch-lang', lang);
+                this.applyLanguage();
+                this.render();
+                this.renderCancelledCosts();
+            },
+
+            t(key) {
+                const entry = TRANSLATIONS[key];
+                if (!entry) return key;
+                return entry[this.lang] || entry.de;
+            },
+
+            applyLanguage() {
+                document.documentElement.lang = this.lang;
+                document.getElementById('langDe').classList.toggle('active', this.lang === 'de');
+                document.getElementById('langEn').classList.toggle('active', this.lang === 'en');
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    el.textContent = this.t(el.getAttribute('data-i18n'));
+                });
+                document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                    el.placeholder = this.t(el.getAttribute('data-i18n-ph'));
+                });
+            },
+
+            translateCategoryLabel(label) {
+                if (this.lang !== 'en') return label;
+                return CATEGORY_LABEL_TRANSLATIONS[label] || label;
             },
 
             loadCustomCategories() {
@@ -1541,17 +1708,17 @@
             manageRecurringCosts() {
                 const body = document.getElementById('yearReviewBody');
                 const header = document.querySelector('.year-review-header span');
-                header.textContent = '🔁 Feste Kosten';
+                header.textContent = this.t('manageRecurringHeader');
 
                 if (this.recurringCosts.length === 0) {
-                    body.innerHTML = '<p>Noch keine festen Kosten hinterlegt. Setz beim nächsten Eintrag den Haken bei "Als feste Kosten merken", dann erscheint er hier und wird ab dem nächsten Monat automatisch eingetragen.</p>';
+                    body.innerHTML = `<p>${this.t('noRecurringCosts')}</p>`;
                 } else {
                     body.innerHTML = this.recurringCosts.map(rc => {
                         const { icon, label } = this.splitCategory(rc.category);
                         return `
                             <div class="yr-stat">
-                                <span>${icon} ${label} – ${rc.amount.toFixed(2)}€/Monat</span>
-                                <button class="remove-btn" onclick="app.deleteRecurringCost(${rc.id})">✕ Entfernen</button>
+                                <span>${icon} ${label} – ${rc.amount.toFixed(2)}€${this.t('perMonthShort')}</span>
+                                <button class="remove-btn" onclick="app.deleteRecurringCost(${rc.id})">${this.t('removeBtn')}</button>
                             </div>
                         `;
                     }).join('');
@@ -1574,7 +1741,7 @@
                 const period = periodSelect.value;
 
                 if (!name || !amount || amount <= 0) {
-                    alert('Bitte gib einen Namen und einen Betrag ein');
+                    alert(this.t('alertNameAndAmount'));
                     return;
                 }
 
@@ -1583,7 +1750,7 @@
                     name,
                     amount,
                     period,
-                    date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                    date: new Date().toLocaleDateString(this.getLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' })
                 });
 
                 this.saveCancelledCosts();
@@ -1608,7 +1775,7 @@
 
                 if (this.cancelledCosts.length === 0) {
                     summary.style.display = 'none';
-                    list.innerHTML = '<p class="hint-text hint-small">Noch nichts gekündigt eingetragen.</p>';
+                    list.innerHTML = `<p class="hint-text hint-small">${this.t('noCancelled')}</p>`;
                     return;
                 }
 
@@ -1624,13 +1791,18 @@
 
                 const sorted = [...this.cancelledCosts].sort((a, b) => b.id - a.id);
                 list.innerHTML = sorted.map(c => {
-                    const periodLabel = c.period === 'jahr' ? 'Jahr' : 'Monat';
+                    const periodLabel = c.period === 'jahr' ? this.t('yearWord') : this.t('monthWord');
                     const monthlyEquivalent = c.period === 'jahr' ? c.amount / 12 : c.amount;
+                    const detail = this.t('cancelledDetail')
+                        .replace('{amount}', c.amount.toFixed(2))
+                        .replace('{period}', periodLabel)
+                        .replace('{monthly}', monthlyEquivalent.toFixed(2))
+                        .replace('{date}', c.date);
                     return `
                         <div class="cancelled-item">
                             <div>
                                 <div class="cancelled-name">✅ ${c.name}</div>
-                                <div class="cancelled-detail">${c.amount.toFixed(2)}€/${periodLabel} entspricht ${monthlyEquivalent.toFixed(2)}€/Monat · gekündigt am ${c.date}</div>
+                                <div class="cancelled-detail">${detail}</div>
                             </div>
                             <button class="remove-btn" onclick="app.deleteCancelledCost(${c.id})">✕</button>
                         </div>
@@ -1645,43 +1817,43 @@
             guessEmoji(name) {
                 const n = name.toLowerCase();
                 const keywordMap = [
-                    [['miete', 'mieter', 'wohnung', 'vermieter'], '🏠'],
-                    [['versicherung', 'police'], '🛡️'],
-                    [['auto', 'kfz', 'wagen', 'werkstatt', 'reifen'], '🚗'],
-                    [['strom', 'energie'], '⚡'],
-                    [['gas', 'heizung', 'öl'], '🔥'],
-                    [['wasser'], '💧'],
-                    [['internet', 'wlan', 'router'], '🌐'],
-                    [['telefon', 'handy', 'mobilfunk'], '📱'],
-                    [['abo', 'abonnement', 'streaming'], '📺'],
-                    [['essen', 'restaurant'], '🍽️'],
-                    [['lebensmittel', 'supermarkt', 'einkauf'], '🛒'],
-                    [['tanken', 'benzin', 'diesel', 'sprit'], '⛽'],
-                    [['apotheke', 'medizin', 'arzt', 'gesundheit'], '💊'],
-                    [['kleidung', 'klamotten', 'schuhe'], '👗'],
-                    [['friseur', 'haare'], '💇'],
-                    [['kino', 'unterhaltung', 'freizeit'], '🎬'],
-                    [['sparen', 'sparkonto'], '💰'],
-                    [['aktie', 'invest', 'etf', 'fonds', 'depot'], '📈'],
+                    [['miete', 'mieter', 'wohnung', 'vermieter', 'rent', 'tenant', 'landlord', 'apartment'], '🏠'],
+                    [['versicherung', 'police', 'insurance', 'policy'], '🛡️'],
+                    [['auto', 'kfz', 'wagen', 'werkstatt', 'reifen', 'car', 'garage', 'tire', 'tyre'], '🚗'],
+                    [['strom', 'energie', 'electricity', 'power', 'energy'], '⚡'],
+                    [['gas', 'heizung', 'öl', 'heating', 'oil'], '🔥'],
+                    [['wasser', 'water'], '💧'],
+                    [['internet', 'wlan', 'router', 'wifi'], '🌐'],
+                    [['telefon', 'handy', 'mobilfunk', 'phone', 'mobile', 'cell'], '📱'],
+                    [['abo', 'abonnement', 'streaming', 'subscription'], '📺'],
+                    [['essen', 'restaurant', 'eating', 'dining'], '🍽️'],
+                    [['lebensmittel', 'supermarkt', 'einkauf', 'groceries', 'grocery', 'supermarket'], '🛒'],
+                    [['tanken', 'benzin', 'diesel', 'sprit', 'fuel', 'petrol', 'gasoline'], '⛽'],
+                    [['apotheke', 'medizin', 'arzt', 'gesundheit', 'pharmacy', 'medicine', 'doctor', 'health'], '💊'],
+                    [['kleidung', 'klamotten', 'schuhe', 'clothing', 'clothes', 'shoes'], '👗'],
+                    [['friseur', 'haare', 'hairdresser', 'haircut', 'salon'], '💇'],
+                    [['kino', 'unterhaltung', 'freizeit', 'cinema', 'entertainment', 'leisure', 'movie'], '🎬'],
+                    [['sparen', 'sparkonto', 'saving', 'savings'], '💰'],
+                    [['aktie', 'invest', 'etf', 'fonds', 'depot', 'stock', 'fund'], '📈'],
                     [['hobby'], '🎯'],
-                    [['reise', 'urlaub', 'flug', 'ferien'], '✈️'],
-                    [['geschenk'], '🎁'],
-                    [['kind', 'kita', 'schule', 'baby'], '👶'],
-                    [['tier', 'hund', 'katze', 'haustier'], '🐾'],
+                    [['reise', 'urlaub', 'flug', 'ferien', 'travel', 'vacation', 'holiday', 'flight', 'trip'], '✈️'],
+                    [['geschenk', 'gift', 'present'], '🎁'],
+                    [['kind', 'kita', 'schule', 'baby', 'child', 'kids', 'school', 'daycare'], '👶'],
+                    [['tier', 'hund', 'katze', 'haustier', 'pet', 'dog', 'cat'], '🐾'],
                     [['sport', 'fitness', 'gym'], '🏋️'],
-                    [['bildung', 'kurs', 'seminar', 'weiterbildung'], '📚'],
-                    [['spende', 'wohltätig'], '❤️'],
-                    [['steuer', 'finanzamt'], '🧾'],
-                    [['möbel', 'einrichtung', 'ikea'], '🛋️'],
-                    [['garten', 'pflanze'], '🌱'],
+                    [['bildung', 'kurs', 'seminar', 'weiterbildung', 'education', 'course', 'training'], '📚'],
+                    [['spende', 'wohltätig', 'donation', 'charity'], '❤️'],
+                    [['steuer', 'finanzamt', 'tax', 'taxes'], '🧾'],
+                    [['möbel', 'einrichtung', 'ikea', 'furniture'], '🛋️'],
+                    [['garten', 'pflanze', 'garden', 'plant'], '🌱'],
                     [['computer', 'pc', 'laptop', 'software'], '💻'],
-                    [['musik', 'konzert', 'instrument'], '🎵'],
-                    [['buch', 'zeitschrift'], '📖'],
-                    [['bank', 'gebühr', 'kredit', 'darlehen'], '🏦'],
-                    [['rechtsschutz', 'anwalt', 'gericht'], '⚖️'],
-                    [['unfall'], '🚑'],
-                    [['hausrat'], '🛋️'],
-                    [['sterbe', 'bestattung'], '🕊️']
+                    [['musik', 'konzert', 'instrument', 'music', 'concert'], '🎵'],
+                    [['buch', 'zeitschrift', 'book', 'magazine'], '📖'],
+                    [['bank', 'gebühr', 'kredit', 'darlehen', 'fee', 'loan', 'credit'], '🏦'],
+                    [['rechtsschutz', 'anwalt', 'gericht', 'legal', 'lawyer', 'court'], '⚖️'],
+                    [['unfall', 'accident'], '🚑'],
+                    [['hausrat', 'contents', 'household'], '🛋️'],
+                    [['sterbe', 'bestattung', 'funeral', 'life insurance'], '🕊️']
                 ];
 
                 for (const [keywords, emoji] of keywordMap) {
@@ -1691,7 +1863,7 @@
             },
 
             addCustomCategory() {
-                const input = prompt('Neue Kategorie hinzufügen.\n\nEinfach den Namen eingeben, z.B. "Mieterschutz" – ein passendes Symbol wird automatisch ausgewählt.');
+                const input = prompt(this.t('promptNewCategory'));
                 if (!input || !input.trim()) return;
                 let name = input.trim();
 
@@ -1710,7 +1882,7 @@
                 const trimmed = `${icon} ${name}`;
 
                 if (CATEGORIES.includes(trimmed) || this.customCategories.includes(trimmed)) {
-                    alert('Diese Kategorie gibt es schon!');
+                    alert(this.t('alertCategoryExists'));
                     return;
                 }
 
@@ -1722,17 +1894,20 @@
             manageCategories() {
                 const body = document.getElementById('yearReviewBody');
                 const header = document.querySelector('.year-review-header span');
-                header.textContent = '⚙️ Eigene Kategorien';
+                header.textContent = this.t('manageCategoriesHeader');
 
                 if (this.customCategories.length === 0) {
-                    body.innerHTML = '<p>Du hast noch keine eigenen Kategorien hinzugefügt. Klick auf "+ Kategorie" unter der Liste, um eine anzulegen.</p>';
+                    body.innerHTML = `<p>${this.t('noCustomCategories')}</p>`;
                 } else {
-                    body.innerHTML = this.customCategories.map((cat, i) => `
+                    body.innerHTML = this.customCategories.map((cat, i) => {
+                        const { icon, label } = this.splitCategory(cat);
+                        return `
                         <div class="yr-stat">
-                            <span>${cat}</span>
-                            <button class="remove-btn" onclick="app.deleteCustomCategory(${i})">✕ Entfernen</button>
+                            <span>${icon} ${label}</span>
+                            <button class="remove-btn" onclick="app.deleteCustomCategory(${i})">${this.t('removeBtn')}</button>
                         </div>
-                    `).join('');
+                    `;
+                    }).join('');
                 }
 
                 document.getElementById('yearReviewOverlay').classList.remove('hidden');
@@ -1779,8 +1954,12 @@
                 this.renderEntries();
             },
 
+            getLocale() {
+                return this.lang === 'en' ? 'en-US' : 'de-DE';
+            },
+
             renderMonthSelector() {
-                const monthName = this.currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                const monthName = this.currentDate.toLocaleDateString(this.getLocale(), { month: 'long', year: 'numeric' });
                 document.getElementById('currentMonth').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
             },
 
@@ -1790,7 +1969,7 @@
                 const isEmoji = /\p{Extended_Pictographic}/u.test(firstToken) && firstToken.length <= 4;
 
                 if (isEmoji && spaceIndex > -1) {
-                    return { icon: firstToken, label: cat.slice(spaceIndex + 1) };
+                    return { icon: firstToken, label: this.translateCategoryLabel(cat.slice(spaceIndex + 1)) };
                 }
                 return { icon: this.guessEmoji(cat), label: cat };
             },
@@ -1801,7 +1980,7 @@
                 container.innerHTML = allCategories.map(cat => {
                     const { icon, label } = this.splitCategory(cat);
                     return `<button class="category-btn" data-category="${cat}" onclick="app.selectCategory(this)"><span class="cat-icon">${icon}</span><span class="cat-label">${label}</span></button>`;
-                }).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()"><span class="cat-icon">➕</span><span class="cat-label">Kategorie</span></button>`;
+                }).join('') + `<button class="category-btn category-btn-add" onclick="app.addCustomCategory()"><span class="cat-icon">➕</span><span class="cat-label">${this.t('addCategoryLabel')}</span></button>`;
             },
 
             selectCategory(btn) {
@@ -1815,15 +1994,15 @@
 
                 document.getElementById('summary').innerHTML = `
                     <div class="summary-card income">
-                        <h3>Einnahmen (Gehalt/Rente)</h3>
+                        <h3>${this.t('incomeLabel')}</h3>
                         <div class="value">+${income.toFixed(2)}€</div>
                     </div>
                     <div class="summary-card expense">
-                        <h3>Ausgaben</h3>
+                        <h3>${this.t('yrExpenses')}</h3>
                         <div class="value">-${expenses.toFixed(2)}€</div>
                     </div>
                     <div class="summary-card ${balanceClass}">
-                        <h3>Bilanz</h3>
+                        <h3>${this.t('balanceLabel')}</h3>
                         <div class="value">${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</div>
                     </div>
                 `;
@@ -1858,16 +2037,16 @@
                 const budgetStatus = document.getElementById('budgetStatus');
                 if (monthlyBudget >= 0) {
                     budgetStatus.className = 'status-ok';
-                    budgetStatus.textContent = '✓ OK';
+                    budgetStatus.textContent = this.t('statusOk');
                 } else {
                     budgetStatus.className = 'status-warning';
-                    budgetStatus.textContent = '⚠ Über Budget';
+                    budgetStatus.textContent = this.t('statusOverBudget');
                 }
 
-                document.getElementById('budgetText').innerHTML = `
-                    Noch <strong>${Math.max(0, dailyBudget).toFixed(2)}€</strong> heute ausgeben
-                    (${daysLeft} Tage, ${monthlyBudget.toFixed(2)}€ verbleibend im Monat)
-                `;
+                const daysWord = this.lang === 'en' ? 'days' : 'Tage';
+                document.getElementById('budgetText').innerHTML = this.lang === 'en'
+                    ? `You can still spend <strong>${Math.max(0, dailyBudget).toFixed(2)}€</strong> today (${daysLeft} ${daysWord}, ${monthlyBudget.toFixed(2)}€ left this month)`
+                    : `Noch <strong>${Math.max(0, dailyBudget).toFixed(2)}€</strong> heute ausgeben (${daysLeft} ${daysWord}, ${monthlyBudget.toFixed(2)}€ verbleibend im Monat)`;
             },
 
             renderEntries() {
@@ -1875,20 +2054,23 @@
                 const container = document.getElementById('entries');
 
                 if (entries.length === 0) {
-                    container.innerHTML = '<div class="no-entries">Noch keine Einträge für diesen Monat</div>';
+                    container.innerHTML = `<div class="no-entries">${this.t('noEntries')}</div>`;
                     return;
                 }
 
-                container.innerHTML = entries.map(e => `
+                container.innerHTML = entries.map(e => {
+                    const { icon, label } = this.splitCategory(e.category);
+                    return `
                     <div class="entry-item">
-                        <div class="category">${e.category}${e.recurring ? ' <span title="Automatisch aus festen Kosten">🔁</span>' : ''}</div>
+                        <div class="category">${icon} ${label}${e.recurring ? ` <span title="${this.t('recurringNoteAuto')}">🔁</span>` : ''}</div>
                         <div class="date">${e.date}</div>
                         <div class="amount ${e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? 'positive' : 'negative'}">
                             ${(e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈') ? '+' : '-')}${e.amount.toFixed(2)}€
                         </div>
                         <button class="delete" onclick="app.deleteEntry(${e.id})">✕</button>
                     </div>
-                `).join('');
+                `;
+                }).join('');
             }
         };
 
@@ -1901,9 +2083,9 @@
                         app.data = JSON.parse(evt.target.result);
                         app.saveData();
                         app.render();
-                        alert('Daten erfolgreich importiert!');
+                        alert(app.t('alertImportSuccess'));
                     } catch (err) {
-                        alert('Fehler beim Importieren: ' + err.message);
+                        alert(app.t('alertImportError') + err.message);
                     }
                 };
                 reader.readAsText(file);
@@ -2013,20 +2195,25 @@
 
             getNotgroschenLabel() {
                 const customTarget = app.settings.notgroschenTarget;
-                return (customTarget !== undefined && customTarget !== null && customTarget > 0) ? 'dein persönliches Ziel' : 'ca. 3 Monatsausgaben';
+                const hasCustom = customTarget !== undefined && customTarget !== null && customTarget > 0;
+                if (app.lang === 'en') {
+                    return hasCustom ? 'your personal goal' : 'approx. 3 months of expenses';
+                }
+                return hasCustom ? 'dein persönliches Ziel' : 'ca. 3 Monatsausgaben';
             },
 
             getGreeting() {
                 const { entries } = this.getStats();
-                let greeting = 'Hey Peter! 👋 Ich bin Hugo, dein Spar-Kumpel. ';
+                const en = app.lang === 'en';
+                let greeting = en ? "Hey! 👋 I'm Hugo, your savings buddy. " : 'Hey Peter! 👋 Ich bin Hugo, dein Spar-Kumpel. ';
 
                 if (entries.length === 0) {
-                    greeting += 'Trag ein paar Ausgaben ein, dann schau ich mir das an und geb dir Tipps! 💡';
+                    greeting += en ? "Add a few expenses, and I'll take a look and give you tips! 💡" : 'Trag ein paar Ausgaben ein, dann schau ich mir das an und geb dir Tipps! 💡';
                     return greeting;
                 }
 
-                greeting += 'Ich hab mir deinen Monat schon angeschaut:<br><br>' + this.findInsights().join('<br><br>');
-                greeting += '<br><br>Frag mich auch gern "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?" 😊';
+                greeting += (en ? "I've already looked at your month:" : 'Ich hab mir deinen Monat schon angeschaut:') + '<br><br>' + this.findInsights().join('<br><br>');
+                greeting += en ? '<br><br>Feel free to ask me "Where can I save?" or "What is the 3-account method?" 😊' : '<br><br>Frag mich auch gern "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?" 😊';
                 return greeting;
             },
 
@@ -2042,16 +2229,25 @@
                     this.addMessage(this.getGreeting(), 'hugo');
                 }
 
+                const en = app.lang === 'en';
                 const suggested = this.getSuggestedSavingsRate();
                 const notgroschen = this.getNotgroschenStatus();
-                let msg = `🎉 Zeit für deine Sparrate! Du hast gerade <strong>${amount.toFixed(2)}€</strong> als Gehalt/Rente eingetragen.<br><br>`;
+                let msg = en
+                    ? `🎉 Time for your savings rate! You just entered <strong>${amount.toFixed(2)}€</strong> as salary/pension.<br><br>`
+                    : `🎉 Zeit für deine Sparrate! Du hast gerade <strong>${amount.toFixed(2)}€</strong> als Gehalt/Rente eingetragen.<br><br>`;
 
                 if (!notgroschen.reached && notgroschen.target > 0) {
-                    msg += `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
+                    msg += en
+                        ? `Before investing: you should first build an <strong>emergency fund</strong> for emergencies (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). You currently have ${notgroschen.fund.toFixed(2)}€ set aside – still <strong>${notgroschen.missing.toFixed(2)}€</strong> missing. Best to set some aside right away (category "💰 Savings")!`
+                        : `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
                 } else if (suggested > 0) {
-                    msg += `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Notgroschen steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
+                    msg += en
+                        ? `Calculated from your current surplus: I suggest setting aside <strong>${suggested}€</strong> right away (savings first, then the rest for living – the "pay yourself first" method). Your emergency fund is already covered, so you could put this straight into an ETF savings plan at Trade Republic! 📈`
+                        : `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Notgroschen steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
                 } else {
-                    msg += `Schau mal, was nach den Fixkosten übrig bleibt – dann kann ich dir eine konkrete Sparrate vorschlagen!`;
+                    msg += en
+                        ? "Take a look at what's left after fixed costs – then I can suggest a concrete savings rate!"
+                        : `Schau mal, was nach den Fixkosten übrig bleibt – dann kann ich dir eine konkrete Sparrate vorschlagen!`;
                 }
 
                 this.addMessage(msg, 'hugo');
@@ -2069,14 +2265,18 @@
                     this.addMessage(this.getGreeting(), 'hugo');
                 }
 
+                const en = app.lang === 'en';
                 let totalMonthly = 0;
                 app.cancelledCosts.forEach(c => {
                     totalMonthly += c.period === 'jahr' ? c.amount / 12 : c.amount;
                 });
                 const totalYearly = totalMonthly * 12;
 
-                const msg = `🎉 Stark! <strong>${name}</strong> gekündigt spart dir <strong>${monthlyAmount.toFixed(2)}€/Monat</strong>.<br><br>` +
-                    `Insgesamt hast du bisher <strong>${app.cancelledCosts.length} Kündigung${app.cancelledCosts.length === 1 ? '' : 'en'}</strong> eingetragen – zusammen <strong>${totalMonthly.toFixed(2)}€/Monat</strong> = <strong>${totalYearly.toFixed(2)}€/Jahr</strong> gespart! 💪 Leg das doch direkt in deine Sparrate mit ein.`;
+                const msg = en
+                    ? `🎉 Nice! Cancelling <strong>${name}</strong> saves you <strong>${monthlyAmount.toFixed(2)}€/month</strong>.<br><br>` +
+                      `You've logged <strong>${app.cancelledCosts.length} cancellation${app.cancelledCosts.length === 1 ? '' : 's'}</strong> so far – together <strong>${totalMonthly.toFixed(2)}€/month</strong> = <strong>${totalYearly.toFixed(2)}€/year</strong> saved! 💪 Consider adding that straight to your savings rate.`
+                    : `🎉 Stark! <strong>${name}</strong> gekündigt spart dir <strong>${monthlyAmount.toFixed(2)}€/Monat</strong>.<br><br>` +
+                      `Insgesamt hast du bisher <strong>${app.cancelledCosts.length} Kündigung${app.cancelledCosts.length === 1 ? '' : 'en'}</strong> eingetragen – zusammen <strong>${totalMonthly.toFixed(2)}€/Monat</strong> = <strong>${totalYearly.toFixed(2)}€/Jahr</strong> gespart! 💪 Leg das doch direkt in deine Sparrate mit ein.`;
 
                 this.addMessage(msg, 'hugo');
             },
@@ -2105,7 +2305,7 @@
             },
 
             getSavingsAdvice(cat) {
-                const advice = {
+                const adviceDe = {
                     '⚡ Strom': 'Ein Stromanbieter-Vergleich einmal im Jahr kann bares Geld sparen.',
                     '📺 Abo': 'Prüf, ob du wirklich alle Abos noch nutzt – oft läuft da unbemerkt was mit.',
                     '🍽️ Essen gehen': 'Ein, zwei Mal weniger im Monat auswärts essen macht schon einen spürbaren Unterschied.',
@@ -2123,7 +2323,26 @@
                     '🚗 Auto': 'Prüf, ob Werkstattkosten oder Zubehör woanders günstiger wären.',
                     '💊 Apotheke': 'Bei Dauermedikamenten lohnt sich manchmal ein Generika-Check beim Arzt.'
                 };
-                return advice[cat] || 'Hier steckt noch ungenutztes Sparpotenzial.';
+                const adviceEn = {
+                    '⚡ Strom': 'Comparing electricity providers once a year can save real money.',
+                    '📺 Abo': "Check if you're really still using all your subscriptions – something often keeps running unnoticed.",
+                    '🍽️ Essen gehen': 'Eating out once or twice less a month already makes a noticeable difference.',
+                    '🎬 Unterhaltung': 'See if there are cheaper alternatives instead of booking everything separately.',
+                    '👗 Kleidung': 'Sale periods or second-hand shopping often save half the price.',
+                    '💇 Friseur': 'Going a bit less often or a cheaper salon can pay off.',
+                    '📱 Telefon': 'Comparing phone plans once a year is almost always worth it.',
+                    '🚑 Unfallversicherung': 'An insurance comparison once a year usually pays off.',
+                    '🛡️ Haftpflichtversicherung': 'An insurance comparison once a year usually pays off.',
+                    '🛋️ Hausratversicherung': 'An insurance comparison once a year usually pays off.',
+                    '🕊️ Sterbeversicherung': 'An insurance comparison once a year usually pays off.',
+                    '⚖️ Rechtsschutzversicherung': 'An insurance comparison once a year usually pays off.',
+                    '🛒 Lebensmittel': 'A weekly meal plan and using deals often saves a few extra euros.',
+                    '⛽ Tanken': 'Price comparison apps can save a few cents per liter.',
+                    '🚗 Auto': 'Check if repair costs or parts would be cheaper elsewhere.',
+                    '💊 Apotheke': 'For regular medication, checking generics with your doctor can sometimes pay off.'
+                };
+                const advice = app.lang === 'en' ? adviceEn : adviceDe;
+                return advice[cat] || (app.lang === 'en' ? 'There\'s still untapped savings potential here.' : 'Hier steckt noch ungenutztes Sparpotenzial.');
             },
 
             getSavingsOpportunities() {
@@ -2179,7 +2398,9 @@
                     if (average > 5 && diff > average * 0.25 && diff > 5) {
                         const { icon, label } = app.splitCategory(cat);
                         const percent = Math.round((diff / average) * 100);
-                        alerts.push(`⚠️ ${icon} <strong>${label}</strong>: Diesen Monat ${data.total.toFixed(2)}€ statt sonst durchschnittlich ${average.toFixed(2)}€ – das sind <strong>${percent}% mehr</strong> als üblich.`);
+                        alerts.push(app.lang === 'en'
+                            ? `⚠️ ${icon} <strong>${label}</strong>: ${data.total.toFixed(2)}€ this month vs. your usual average of ${average.toFixed(2)}€ – that's <strong>${percent}% more</strong> than usual.`
+                            : `⚠️ ${icon} <strong>${label}</strong>: Diesen Monat ${data.total.toFixed(2)}€ statt sonst durchschnittlich ${average.toFixed(2)}€ – das sind <strong>${percent}% mehr</strong> als üblich.`);
                     }
                 });
 
@@ -2188,6 +2409,7 @@
 
             findInsights() {
                 const { income, expenses, balance } = this.getStats();
+                const en = app.lang === 'en';
                 const tips = [];
 
                 tips.push(...this.getOverspendingAlerts());
@@ -2195,24 +2417,32 @@
                 const opportunities = this.getSavingsOpportunities();
                 opportunities.slice(0, 3).forEach(opp => {
                     const { icon, label } = app.splitCategory(opp.category);
-                    tips.push(`${icon} Bei <strong>${label}</strong> gibst du ${opp.total.toFixed(2)}€/Monat aus. Realistisch <strong>${(opp.rate * 100).toFixed(0)}% einsparbar</strong> = <strong>${opp.monthlySavings.toFixed(2)}€/Monat</strong> (<strong>${opp.yearlySavings.toFixed(2)}€/Jahr</strong>). ${opp.advice}`);
+                    tips.push(en
+                        ? `${icon} For <strong>${label}</strong> you spend ${opp.total.toFixed(2)}€/month. Realistically <strong>${(opp.rate * 100).toFixed(0)}% saveable</strong> = <strong>${opp.monthlySavings.toFixed(2)}€/month</strong> (<strong>${opp.yearlySavings.toFixed(2)}€/year</strong>). ${opp.advice}`
+                        : `${icon} Bei <strong>${label}</strong> gibst du ${opp.total.toFixed(2)}€/Monat aus. Realistisch <strong>${(opp.rate * 100).toFixed(0)}% einsparbar</strong> = <strong>${opp.monthlySavings.toFixed(2)}€/Monat</strong> (<strong>${opp.yearlySavings.toFixed(2)}€/Jahr</strong>). ${opp.advice}`);
                 });
 
                 if (balance < 0) {
-                    tips.push(`⚠️ Diesen Monat gibst du <strong>${Math.abs(balance).toFixed(2)}€ mehr aus, als reinkommt</strong>. Kein Grund zu Panik, aber schau mal, wo du kleine Schrauben drehen kannst.`);
+                    tips.push(en
+                        ? `⚠️ This month you're spending <strong>${Math.abs(balance).toFixed(2)}€ more than comes in</strong>. No reason to panic, but take a look at where you could tighten things.`
+                        : `⚠️ Diesen Monat gibst du <strong>${Math.abs(balance).toFixed(2)}€ mehr aus, als reinkommt</strong>. Kein Grund zu Panik, aber schau mal, wo du kleine Schrauben drehen kannst.`);
                 } else if (balance > 0 && income > 0) {
                     const suggested = this.getSuggestedSavingsRate();
                     const notgroschen = this.getNotgroschenStatus();
 
                     if (!notgroschen.reached && notgroschen.target > 0) {
-                        tips.push(`✅ Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (Ziel: ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€) – noch <strong>${notgroschen.missing.toFixed(2)}€</strong> fehlen als Sicherheitspuffer für Notfälle.`);
+                        tips.push(en
+                            ? `✅ You have <strong>${balance.toFixed(2)}€ left</strong> this month. Before investing: build an <strong>emergency fund</strong> first (goal: ${notgroschen.target.toFixed(2)}€, you already have ${notgroschen.fund.toFixed(2)}€) – <strong>${notgroschen.missing.toFixed(2)}€</strong> still missing as a safety buffer.`
+                            : `✅ Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (Ziel: ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€) – noch <strong>${notgroschen.missing.toFixed(2)}€</strong> fehlen als Sicherheitspuffer für Notfälle.`);
                     } else {
-                        tips.push(`✅ Läuft gut! Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Berechnet vorgeschlagen: <strong>${suggested}€</strong> davon sparen, den Rest als Puffer lassen. Dein Notgroschen steht schon – das könntest du auch in einen ETF-Sparplan bei Trade Republic stecken!`);
+                        tips.push(en
+                            ? `✅ Going well! You have <strong>${balance.toFixed(2)}€ left</strong> this month. Calculated suggestion: save <strong>${suggested}€</strong> of it, keep the rest as a buffer. Your emergency fund is covered – you could put this into an ETF savings plan at Trade Republic!`
+                            : `✅ Läuft gut! Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Berechnet vorgeschlagen: <strong>${suggested}€</strong> davon sparen, den Rest als Puffer lassen. Dein Notgroschen steht schon – das könntest du auch in einen ETF-Sparplan bei Trade Republic stecken!`);
                     }
                 }
 
                 if (tips.length === 0) {
-                    tips.push('Bisher sieht bei dir alles ziemlich unauffällig aus – weiter so! 👍');
+                    tips.push(en ? "Everything looks pretty unremarkable so far – keep it up! 👍" : 'Bisher sieht bei dir alles ziemlich unauffällig aus – weiter so! 👍');
                 }
 
                 return tips;
@@ -2220,87 +2450,130 @@
 
             getAnswer(question) {
                 const q = question.toLowerCase();
+                const en = app.lang === 'en';
                 const { income, expenses, balance, byCategory, entries } = this.getStats();
 
                 if (entries.length === 0) {
-                    return 'Ich hab noch gar keine Einträge von dir diesen Monat gesehen. Trag mal was ein, dann kann ich dir konkrete Tipps geben! 📝';
+                    return en
+                        ? "I haven't seen any entries from you this month yet. Add something, and I can give you concrete tips! 📝"
+                        : 'Ich hab noch gar keine Einträge von dir diesen Monat gesehen. Trag mal was ein, dann kann ich dir konkrete Tipps geben! 📝';
                 }
 
-                if (q.includes('wie sieht') || q.includes('überblick') || q.includes('analyse') || q.includes('status')) {
-                    return `📊 So sieht's aus: Einnahmen <strong>${income.toFixed(2)}€</strong>, Ausgaben <strong>${expenses.toFixed(2)}€</strong>, Bilanz <strong>${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</strong>. ` + this.findInsights().join(' ');
+                if (q.includes('wie sieht') || q.includes('überblick') || q.includes('analyse') || q.includes('status') ||
+                    q.includes('how does it look') || q.includes('overview') || q.includes('summary')) {
+                    return (en
+                        ? `📊 Here's how it looks: Income <strong>${income.toFixed(2)}€</strong>, Expenses <strong>${expenses.toFixed(2)}€</strong>, Balance <strong>${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</strong>. `
+                        : `📊 So sieht's aus: Einnahmen <strong>${income.toFixed(2)}€</strong>, Ausgaben <strong>${expenses.toFixed(2)}€</strong>, Bilanz <strong>${balance >= 0 ? '+' : ''}${balance.toFixed(2)}€</strong>. `) + this.findInsights().join(' ');
                 }
 
-                if (q.includes('spar') && (q.includes('wo') || q.includes('wie') || q.includes('tipp'))) {
+                if ((q.includes('spar') && (q.includes('wo') || q.includes('wie') || q.includes('tipp'))) ||
+                    (q.includes('save') && (q.includes('where') || q.includes('how') || q.includes('tip')))) {
                     const insights = this.findInsights();
-                    return insights.join('<br><br>') + '<br><br>💡 Und denk an die "Zuerst sparen"-Methode: Sobald Geld reinkommt, direkt einen Teil auf ein separates Konto packen – bevor du überhaupt die Chance hast, es auszugeben!';
+                    return insights.join('<br><br>') + (en
+                        ? '<br><br>💡 And remember the "pay yourself first" method: as soon as money comes in, move part of it to a separate account right away – before you even get the chance to spend it!'
+                        : '<br><br>💡 Und denk an die "Zuerst sparen"-Methode: Sobald Geld reinkommt, direkt einen Teil auf ein separates Konto packen – bevor du überhaupt die Chance hast, es auszugeben!');
                 }
 
-                if (q.includes('notgroschen') || q.includes('puffer') || q.includes('rücklage')) {
+                if (q.includes('notgroschen') || q.includes('puffer') || q.includes('rücklage') ||
+                    q.includes('emergency fund') || q.includes('buffer') || q.includes('rainy day')) {
                     const notgroschen = this.getNotgroschenStatus();
                     if (notgroschen.target === 0) {
-                        return 'Dazu brauch ich ein bisschen mehr Daten von dir. Trag über ein paar Monate deine Ausgaben ein, dann kann ich dir sagen, wie groß dein Notgroschen sein sollte! 📝';
+                        return en
+                            ? "I need a bit more data from you for that. Add your expenses over a few months, and I can tell you how big your emergency fund should be! 📝"
+                            : 'Dazu brauch ich ein bisschen mehr Daten von dir. Trag über ein paar Monate deine Ausgaben ein, dann kann ich dir sagen, wie groß dein Notgroschen sein sollte! 📝';
                     }
                     if (notgroschen.reached) {
-                        return `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
+                        return en
+                            ? `✅ Your emergency fund is set! You've set aside <strong>${notgroschen.fund.toFixed(2)}€</strong> (goal was ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). You're covered for emergencies – now you can think about investing! 📈`
+                            : `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
                     }
-                    return `🛡️ Dein Notgroschen-Ziel liegt bei <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht! Du kannst das Ziel übrigens jederzeit bei "Sparfortschritt & Budget" selbst anpassen.`;
+                    return en
+                        ? `🛡️ Your emergency fund goal is <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). You've already set aside ${notgroschen.fund.toFixed(2)}€, still <strong>${notgroschen.missing.toFixed(2)}€</strong> missing. That's your buffer for emergencies, before investing! You can adjust this goal anytime under "Savings Progress & Budget".`
+                        : `🛡️ Dein Notgroschen-Ziel liegt bei <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht! Du kannst das Ziel übrigens jederzeit bei "Sparfortschritt & Budget" selbst anpassen.`;
                 }
 
-                if (q.includes('sparrate') || q.includes('wie viel') && q.includes('spar')) {
+                if (q.includes('sparrate') || (q.includes('wie viel') && q.includes('spar')) ||
+                    q.includes('savings rate') || (q.includes('how much') && q.includes('save'))) {
                     const suggested = this.getSuggestedSavingsRate();
                     if (suggested > 0) {
-                        return `💰 Berechnet aus deinem aktuellen Überschuss: Ich schlage <strong>${suggested}€ im Monat</strong> vor. Das lässt dir noch genug Puffer für Unvorhergesehenes.`;
+                        return en
+                            ? `💰 Calculated from your current surplus: I suggest <strong>${suggested}€ per month</strong>. That still leaves you enough buffer for the unexpected.`
+                            : `💰 Berechnet aus deinem aktuellen Überschuss: Ich schlage <strong>${suggested}€ im Monat</strong> vor. Das lässt dir noch genug Puffer für Unvorhergesehenes.`;
                     }
-                    return 'Aktuell bleibt bei dir nicht viel übrig zum Sparen. Schau mal bei "Wo kann ich sparen?" nach, ob wir was finden!';
+                    return en
+                        ? 'Right now there\'s not much left over to save. Check "Where can I save?" to see if we can find something!'
+                        : 'Aktuell bleibt bei dir nicht viel übrig zum Sparen. Schau mal bei "Wo kann ich sparen?" nach, ob wir was finden!';
                 }
 
-                if (q.includes('methode') || q.includes('3 konten') || q.includes('konten modell')) {
-                    return '💰 Die "Zuerst sparen"-Methode ist simpel:<br>1️⃣ <strong>Konto 1</strong>: Gehalt/Rente kommt rein<br>2️⃣ <strong>Konto 2</strong>: Fixkosten (Miete, Strom, Versicherung)<br>3️⃣ <strong>Konto 3</strong>: Zum Leben (Essen, Freizeit)<br><br>Der Trick: Die Sparrate wird SOFORT bei Geldeingang auf ein extra Konto verschoben – nicht erst am Monatsende, wenn eh nichts mehr übrig ist! 😉';
+                if (q.includes('methode') || q.includes('3 konten') || q.includes('konten modell') ||
+                    q.includes('method') || q.includes('3 account') || q.includes('account model')) {
+                    return en
+                        ? '💰 The "pay yourself first" method is simple:<br>1️⃣ <strong>Account 1</strong>: Salary/pension comes in<br>2️⃣ <strong>Account 2</strong>: Fixed costs (rent, electricity, insurance)<br>3️⃣ <strong>Account 3</strong>: For living (food, leisure)<br><br>The trick: the savings rate is moved to a separate account IMMEDIATELY when money arrives – not at the end of the month, when there is nothing left anyway! 😉'
+                        : '💰 Die "Zuerst sparen"-Methode ist simpel:<br>1️⃣ <strong>Konto 1</strong>: Gehalt/Rente kommt rein<br>2️⃣ <strong>Konto 2</strong>: Fixkosten (Miete, Strom, Versicherung)<br>3️⃣ <strong>Konto 3</strong>: Zum Leben (Essen, Freizeit)<br><br>Der Trick: Die Sparrate wird SOFORT bei Geldeingang auf ein extra Konto verschoben – nicht erst am Monatsende, wenn eh nichts mehr übrig ist! 😉';
                 }
 
-                if (q.includes('abo')) {
+                if (q.includes('abo') || q.includes('subscription')) {
                     const abo = byCategory['📺 Abo'];
                     if (abo) {
                         const rate = this.getReductionRate('📺 Abo');
                         const monthlySavings = abo.total * rate;
-                        return `📺 Du hast diesen Monat ${abo.count}x Abo-Kosten von insgesamt ${abo.total.toFixed(2)}€ eingetragen. Hochgerechnet aufs Jahr sind das <strong>${(abo.total * 12).toFixed(2)}€</strong>! Wenn du ${(rate * 100).toFixed(0)}% davon kündigst, sparst du <strong>${monthlySavings.toFixed(2)}€/Monat</strong> = <strong>${(monthlySavings * 12).toFixed(2)}€/Jahr</strong>. Check mal auf deinem Kontoauszug, welche Abos wirklich noch genutzt werden.`;
+                        return en
+                            ? `📺 You've logged ${abo.count}x subscription costs totalling ${abo.total.toFixed(2)}€ this month. Projected over a year that's <strong>${(abo.total * 12).toFixed(2)}€</strong>! If you cancel ${(rate * 100).toFixed(0)}% of that, you save <strong>${monthlySavings.toFixed(2)}€/month</strong> = <strong>${(monthlySavings * 12).toFixed(2)}€/year</strong>. Check your bank statement for which subscriptions are actually still used.`
+                            : `📺 Du hast diesen Monat ${abo.count}x Abo-Kosten von insgesamt ${abo.total.toFixed(2)}€ eingetragen. Hochgerechnet aufs Jahr sind das <strong>${(abo.total * 12).toFixed(2)}€</strong>! Wenn du ${(rate * 100).toFixed(0)}% davon kündigst, sparst du <strong>${monthlySavings.toFixed(2)}€/Monat</strong> = <strong>${(monthlySavings * 12).toFixed(2)}€/Jahr</strong>. Check mal auf deinem Kontoauszug, welche Abos wirklich noch genutzt werden.`;
                     }
-                    return 'Ich seh diesen Monat keine Abo-Einträge bei dir. Wenn du welche hast, trag sie mal ein, dann schau ich sie mir an! 👍';
+                    return en
+                        ? "I don't see any subscription entries from you this month. If you have some, add them and I'll take a look! 👍"
+                        : 'Ich seh diesen Monat keine Abo-Einträge bei dir. Wenn du welche hast, trag sie mal ein, dann schau ich sie mir an! 👍';
                 }
 
-                if (q.includes('trade republic') || q.includes('investier') || q.includes('etf') || q.includes('aktie')) {
+                if (q.includes('trade republic') || q.includes('investier') || q.includes('etf') || q.includes('aktie') ||
+                    q.includes('invest') || q.includes('stock')) {
                     const notgroschen = this.getNotgroschenStatus();
                     const suggested = this.getSuggestedSavingsRate();
 
                     if (!notgroschen.reached && notgroschen.target > 0) {
-                        return `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
+                        return en
+                            ? `📈 Before investing: build an <strong>emergency fund</strong> first (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, you already have ${notgroschen.fund.toFixed(2)}€, ${notgroschen.missing.toFixed(2)}€ still missing). That's your safety buffer for emergencies – washing machine breaks, car repair, etc. Only once that's covered does investing really make sense! 😊`
+                            : `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
                     }
 
-                    let msg = `📈 Dein Notgroschen steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
+                    let msg = en
+                        ? `📈 Your emergency fund is already covered – nice! You're already with <strong>Trade Republic</strong>. A broad ETF savings plan (e.g. on the MSCI World), set up <strong>automatically monthly</strong>, is a simple way to get more out of your money long-term than a savings account.`
+                        : `📈 Dein Notgroschen steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
                     if (suggested > 0) {
-                        msg += ` Berechnet aus deinem aktuellen Überschuss könntest du z.B. <strong>${suggested}€/Monat</strong> automatisch in den Sparplan wandern lassen.`;
+                        msg += en
+                            ? ` Calculated from your current surplus, you could move e.g. <strong>${suggested}€/month</strong> automatically into the savings plan.`
+                            : ` Berechnet aus deinem aktuellen Überschuss könntest du z.B. <strong>${suggested}€/Monat</strong> automatisch in den Sparplan wandern lassen.`;
                     }
-                    msg += ` Wichtig: Das ist kein Finanzrat, nur ein allgemeiner Denkanstoß – informier dich gut, bevor du was entscheidest! 😊`;
+                    msg += en
+                        ? ` Important: this isn't financial advice, just a general thought – do your own research before deciding anything! 😊`
+                        : ` Wichtig: Das ist kein Finanzrat, nur ein allgemeiner Denkanstoß – informier dich gut, bevor du was entscheidest! 😊`;
                     return msg;
                 }
 
-                if (q.includes('budget') || q.includes('heute')) {
+                if (q.includes('budget') || q.includes('heute') || q.includes('today')) {
                     const daysInMonth = new Date(app.currentDate.getFullYear(), app.currentDate.getMonth() + 1, 0).getDate();
                     const dayOfMonth = new Date().getDate();
                     const daysLeft = daysInMonth - dayOfMonth + 1;
                     const dailyBudget = daysLeft > 0 ? balance / daysLeft : 0;
-                    return `📅 Du hast noch ${daysLeft} Tage in diesem Monat. Bei deiner aktuellen Bilanz kannst du noch etwa <strong>${Math.max(0, dailyBudget).toFixed(2)}€ pro Tag</strong> ausgeben, damit es am Monatsende aufgeht.`;
+                    return en
+                        ? `📅 You have ${daysLeft} days left this month. With your current balance, you can spend about <strong>${Math.max(0, dailyBudget).toFixed(2)}€ per day</strong> to make it to the end of the month.`
+                        : `📅 Du hast noch ${daysLeft} Tage in diesem Monat. Bei deiner aktuellen Bilanz kannst du noch etwa <strong>${Math.max(0, dailyBudget).toFixed(2)}€ pro Tag</strong> ausgeben, damit es am Monatsende aufgeht.`;
                 }
 
-                if (q.includes('danke')) {
-                    return 'Immer gerne, Peter! 😄 Ich bin ja für dich da.';
+                if (q.includes('danke') || q.includes('thank')) {
+                    return en ? "Anytime! 😄 I'm here for you." : 'Immer gerne, Peter! 😄 Ich bin ja für dich da.';
                 }
 
-                if (q.includes('hallo') || q.includes('hi') || q.includes('hey')) {
-                    return 'Hey! 👋 Frag mich gern "Wie sieht es aus?", "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?"';
+                if (q.includes('hallo') || q.includes('hi') || q.includes('hey') || q.includes('hello')) {
+                    return en
+                        ? 'Hey! 👋 Feel free to ask me "How does it look?", "Where can I save?" or "What is the 3-account method?"'
+                        : 'Hey! 👋 Frag mich gern "Wie sieht es aus?", "Wo kann ich sparen?" oder "Was ist die 3-Konten-Methode?"';
                 }
 
-                return 'Frag mich zum Beispiel: "Wie sieht es aus?", "Wo kann ich sparen?", "Was sind meine Abos?" oder "Was ist die Zuerst-sparen-Methode?" 😊';
+                return en
+                    ? 'Try asking me: "How does it look?", "Where can I save?", "What are my subscriptions?" or "What is the pay-yourself-first method?" 😊'
+                    : 'Frag mich zum Beispiel: "Wie sieht es aus?", "Wo kann ich sparen?", "Was sind meine Abos?" oder "Was ist die Zuerst-sparen-Methode?" 😊';
             }
         };
 
