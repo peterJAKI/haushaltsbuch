@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Haushaltsbuch – Handbuch</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg-page-1: #e0f7f6;
+            --bg-page-2: #e0f4ff;
+            --bg-container: #ffffff;
+            --bg-surface: #f9f9f9;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --accent: #17a2b8;
+            --accent-dark: #0d6eaa;
+            --gold: #ffd700;
+            --success: #28a745;
+            --danger: #dc3545;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-page-1: #0d1518;
+                --bg-page-2: #0e1620;
+                --bg-container: #17212b;
+                --bg-surface: #1d2933;
+                --text-primary: #e8eef1;
+                --text-secondary: #aab7c0;
+                --border-color: #2e3d47;
+                --accent: #2bc4dc;
+                --accent-dark: #4fa8d8;
+                --shadow-color: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 20px 16px 60px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-page-1), var(--bg-page-2));
+            color: var(--text-primary);
+            line-height: 1.65;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--bg-container);
+            border-radius: 12px;
+            box-shadow: 0 2px 14px var(--shadow-color);
+            padding: 28px 30px 40px;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 16px;
+            margin-bottom: 8px;
+        }
+
+        h1 { font-size: 26px; margin: 0; }
+        .subtitle { color: var(--text-secondary); font-size: 14px; margin: 4px 0 0; }
+
+        .lang-switch { display: flex; gap: 6px; }
+        .lang-switch button {
+            padding: 7px 16px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .lang-switch button.active {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        h2 {
+            font-size: 19px;
+            margin: 34px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        h3 { font-size: 16px; margin: 22px 0 6px; }
+        p, li { font-size: 15px; }
+        ul, ol { padding-left: 22px; }
+        li { margin-bottom: 6px; }
+
+        .box {
+            background: var(--bg-surface);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 14px 0;
+        }
+        .box.warn { border-left-color: var(--danger); }
+        .box.tip { border-left-color: var(--gold); }
+
+        .toc { background: var(--bg-surface); border-radius: 8px; padding: 14px 18px; margin-top: 18px; }
+        .toc ol { margin: 6px 0 0; }
+        .toc a { color: var(--accent-dark); }
+
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+        th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+        th { background: var(--bg-surface); }
+
+        code {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 13px;
+        }
+
+        .step { font-weight: 600; color: var(--accent-dark); }
+
+        footer { margin-top: 40px; color: var(--text-secondary); font-size: 13px; text-align: center; }
+
+        [hidden] { display: none !important; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; max-width: none; }
+            .lang-switch { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 16px 30px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <div>
+            <h1>📊 Haushaltsbuch</h1>
+            <p class="subtitle" data-sub-de="Handbuch – alle Funktionen einfach erklärt"
+               data-sub-en="Manual – every feature explained simply">Handbuch – alle Funktionen einfach erklärt</p>
+        </div>
+        <div class="lang-switch">
+            <button id="btnDe" class="active" onclick="setLang('de')">Deutsch</button>
+            <button id="btnEn" onclick="setLang('en')">English</button>
+        </div>
+    </header>
+
+    <!-- ===================== DEUTSCH ===================== -->
+    <div id="de">
+        <div class="toc">
+            <strong>Inhalt</strong>
+            <ol>
+                <li><a href="#de1">Was ist das Haushaltsbuch?</a></li>
+                <li><a href="#de2">Einen Eintrag hinzufügen</a></li>
+                <li><a href="#de3">Kategorien verwalten</a></li>
+                <li><a href="#de4">Feste Kosten</a></li>
+                <li><a href="#de5">Die Übersicht: Einnahmen, Ausgaben, Bilanz</a></li>
+                <li><a href="#de6">Sparfortschritt &amp; Budget</a></li>
+                <li><a href="#de7">Gekündigte Kosten</a></li>
+                <li><a href="#de8">Monatsvergleich</a></li>
+                <li><a href="#de9">Einträge und Monatswechsel</a></li>
+                <li><a href="#de10">Jahresrückblick</a></li>
+                <li><a href="#de11">Hugo, dein Spar-Berater</a></li>
+                <li><a href="#de12">Daten sichern und wiederherstellen</a></li>
+                <li><a href="#de13">Sprache umschalten</a></li>
+                <li><a href="#de14">Auf dem Handy nutzen</a></li>
+                <li><a href="#de15">Häufige Fragen</a></li>
+            </ol>
+        </div>
+
+        <h2 id="de1">1. Was ist das Haushaltsbuch?</h2>
+        <p>Das Haushaltsbuch ist deine persönliche Einnahmen- und Ausgabenübersicht. Du trägst ein, was reinkommt und was rausgeht, und siehst jederzeit, wie du stehst – pro Monat, im Vergleich zu früheren Monaten und übers ganze Jahr.</p>
+        <p>Du erreichst es auf zwei Wegen:</p>
+        <ul>
+            <li>Über das Symbol <strong>Haushaltsbuch</strong> auf deinem Desktop (funktioniert auch ohne Internet)</li>
+            <li>Im Browser unter <code>peterjaki.github.io/haushaltsbuch</code> – auch auf dem Handy</li>
+        </ul>
+        <div class="box">
+            <strong>Wichtig zu wissen:</strong> Deine Daten bleiben auf dem Gerät, auf dem du sie eingibst. Sie gehen nicht ins Internet und niemand anderes kann sie sehen. Das heißt aber auch: Einträge vom PC erscheinen <em>nicht</em> automatisch auf dem Handy. Wie du sie überträgst, steht in Kapitel 12.
+        </div>
+
+        <h2 id="de2">2. Einen Eintrag hinzufügen</h2>
+        <p>So trägst du eine Einnahme oder Ausgabe ein:</p>
+        <ol>
+            <li><span class="step">Kategorie anklicken</span> – zum Beispiel 🛒 Lebensmittel oder 💵 Gehalt/Rente. Die gewählte Kategorie wird farbig umrandet.</li>
+            <li><span class="step">Summe eintippen</span> – nur die Zahl, zum Beispiel <code>42,50</code>.</li>
+            <li><span class="step">Auf "Hinzufügen" klicken</span> – fertig. Der Eintrag erscheint sofort unten in der Liste.</li>
+        </ol>
+        <div class="box tip">
+            <strong>Tipp:</strong> Ein kleines ✓ an einer Kategorie bedeutet: In diesem Monat hast du dort schon etwas eingetragen.
+        </div>
+        <p>Die App erkennt automatisch, ob es sich um Einnahmen oder Ausgaben handelt: 💵 Gehalt/Rente, 💰 Sparen und 📈 Investitionen zählen als Einnahmen, alles andere als Ausgaben.</p>
+
+        <h2 id="de3">3. Kategorien verwalten</h2>
+        <p>Über <strong>⚙️ Kategorien verwalten</strong> oder das ➕-Feld legst du eigene Kategorien an, zum Beispiel "Wandern" oder "Geschenke".</p>
+        <p>Ein passendes Symbol sucht die App dabei selbst aus – schreibst du zum Beispiel "Hund", bekommst du automatisch 🐕. Eigene Kategorien kannst du dort auch wieder löschen.</p>
+
+        <h2 id="de4">4. Feste Kosten</h2>
+        <p>Kosten, die jeden Monat gleich sind (Miete, Strom, Versicherungen), musst du nur einmal eintragen:</p>
+        <ol>
+            <li>Eintrag wie gewohnt erstellen</li>
+            <li>Vorher den Haken bei <strong>🔁 Als feste Kosten merken</strong> setzen</li>
+        </ol>
+        <p>Ab dann trägt die App diesen Betrag in jedem neuen Monat automatisch für dich ein. Unter <strong>🔁 Feste Kosten verwalten</strong> siehst du alle und kannst sie einzeln wieder entfernen.</p>
+
+        <h2 id="de5">5. Die Übersicht: Einnahmen, Ausgaben, Bilanz</h2>
+        <p>Die drei farbigen Karten oben zeigen dir für den gewählten Monat:</p>
+        <table>
+            <tr><th>Karte</th><th>Bedeutung</th></tr>
+            <tr><td>Einnahmen</td><td>Alles, was reingekommen ist</td></tr>
+            <tr><td>Ausgaben</td><td>Alles, was rausgegangen ist</td></tr>
+            <tr><td>Bilanz</td><td>Die Differenz. Grün = du hast übrig, Rot = du hast mehr ausgegeben als eingenommen</td></tr>
+        </table>
+
+        <h2 id="de6">6. Sparfortschritt &amp; Budget</h2>
+
+        <h3>💰 Sparziel</h3>
+        <p>Trag ein, wie viel du im Monat sparen möchtest. Der Balken zeigt dir, wie weit du bist. Als "gespart" zählt deine Bilanz, also was am Monatsende übrig bleibt.</p>
+
+        <h3>🪙 Notgroschen-Ziel</h3>
+        <p>Das ist dein Polster für Notfälle. Gibst du nichts an, rechnet Hugo automatisch mit drei Monatsausgaben. Da das für viele unrealistisch hoch ist, kannst du hier deinen eigenen Wunschbetrag festlegen.</p>
+
+        <h3>🛒 Lebensmittel-Budget</h3>
+        <p>Hier legst du fest, wie viel du monatlich für Lebensmittel ausgeben willst (voreingestellt sind 200 €). Der Balken füllt sich mit jedem Eintrag in der Kategorie 🛒 Lebensmittel und wechselt dabei die Farbe:</p>
+        <table>
+            <tr><th>Farbe</th><th>Bedeutung</th></tr>
+            <tr><td>Türkis</td><td>Alles im Rahmen</td></tr>
+            <tr><td>Gelb</td><td>Ab 80 % – langsam wird's knapp</td></tr>
+            <tr><td>Rot</td><td>Budget überschritten</td></tr>
+        </table>
+        <p>Darunter steht immer, wie viel Euro dir noch bleiben – oder um wie viel du drüber bist.</p>
+
+        <h3>📅 Tagesbudget</h3>
+        <p>Zeigt dir, wie viel du ab heute noch pro Tag ausgeben kannst, damit du am Monatsende nicht ins Minus rutschst. Die App rechnet dabei die restlichen Tage des Monats mit.</p>
+
+        <h2 id="de7">7. Gekündigte Kosten</h2>
+        <p>Hier sammelst du alles, was du abbestellt oder gekündigt hast – zum Beispiel ein Abo oder eine Mitgliedschaft.</p>
+        <ol>
+            <li>Name eintragen (z.B. "ADAC")</li>
+            <li>Betrag eintragen</li>
+            <li>Wählen: <strong>pro Jahr</strong> oder <strong>pro Monat</strong></li>
+        </ol>
+        <p>Die App rechnet automatisch beides aus und zeigt dir oben, wie viel du dadurch <strong>pro Monat</strong> und <strong>pro Jahr</strong> sparst. Das wächst mit jeder weiteren Kündigung – eine schöne Motivation.</p>
+
+        <h2 id="de8">8. Monatsvergleich</h2>
+        <p>Das Balkendiagramm vergleicht den aktuellen Monat mit dem Vormonat, aufgeschlüsselt nach Kategorien. So siehst du sofort, wo du mehr oder weniger ausgegeben hast als zuletzt.</p>
+
+        <h2 id="de9">9. Einträge und Monatswechsel</h2>
+        <p>Mit <strong>← Vorheriger</strong> und <strong>Nächster →</strong> ganz oben wechselst du den Monat. Jeder Monat hat seine eigenen Einträge.</p>
+        <p>In der Liste <strong>📋 Einträge</strong> stehen alle Buchungen des Monats, die neueste oben. Über das Papierkorb-Symbol löschst du einen einzelnen Eintrag.</p>
+
+        <h2 id="de10">10. Jahresrückblick</h2>
+        <p>Der Knopf <strong>📅 Jahresrückblick</strong> öffnet eine Zusammenfassung des ganzen Jahres:</p>
+        <ul>
+            <li>Einnahmen und Ausgaben des Jahres</li>
+            <li>Wie viel du insgesamt gespart hast</li>
+            <li>Deine größte Ausgaben-Kategorie</li>
+            <li>Dein bester und dein schwächster Monat</li>
+        </ul>
+
+        <h2 id="de11">11. Hugo, dein Spar-Berater</h2>
+        <p>Unten rechts sitzt 🧑‍💼 <strong>Hugo</strong>. Klick ihn an und stell ihm Fragen in normaler Sprache. Er rechnet mit deinen echten Zahlen – kein Internet nötig.</p>
+        <p>Das versteht er zum Beispiel:</p>
+        <ul>
+            <li><em>"Wie sieht es aus?"</em> – Überblick über deine aktuelle Lage</li>
+            <li><em>"Wo kann ich sparen?"</em> – konkrete Vorschläge, berechnet aus deinen Kategorien</li>
+            <li><em>"Wie viel soll ich sparen?"</em> – deine Sparquote</li>
+            <li><em>"Was ist mit meinem Notgroschen?"</em> – wie weit dein Polster reicht</li>
+            <li><em>"Was sind meine Abos?"</em> – Übersicht deiner laufenden Kosten</li>
+            <li><em>"Was ist die 3-Konten-Methode?"</em> – einfache Spar-Methode erklärt</li>
+            <li><em>"Was kann ich heute ausgeben?"</em> – dein Tagesbudget</li>
+        </ul>
+        <p>Hugo warnt dich außerdem von selbst, wenn du in einer Kategorie deutlich mehr ausgibst als sonst, und gratuliert dir zu jeder Kündigung.</p>
+
+        <h2 id="de12">12. Daten sichern und wiederherstellen</h2>
+        <div class="box warn">
+            <strong>Das ist das wichtigste Kapitel.</strong> Deine Daten liegen nur auf diesem einen Gerät. Löschst du den Browser-Verlauf samt Website-Daten oder geht der PC kaputt, sind die Einträge weg – es sei denn, du hast vorher gesichert.
+        </div>
+        <p><strong>Sichern:</strong> Klick auf <strong>💾 Daten exportieren</strong>. Es wird eine Datei heruntergeladen, die alles enthält (Name z.B. <code>haushaltsbuch-2026-09-18.json</code>). Leg sie irgendwo ab, wo du sie wiederfindest.</p>
+        <p><strong>Wiederherstellen oder übertragen:</strong> Klick auf <strong>📂 Daten importieren</strong> und wähle genau diese Datei aus. So bringst du deine Einträge auch vom PC aufs Handy oder zurück.</p>
+        <div class="box tip">
+            <strong>Empfehlung:</strong> Einmal im Monat exportieren, zum Beispiel immer am Monatsersten, wenn du die festen Kosten kontrollierst.
+        </div>
+
+        <h3>🗑️ Monat löschen</h3>
+        <p>Der rote Knopf löscht <strong>alle Einträge des gerade angezeigten Monats</strong>. Andere Monate bleiben unberührt. Das lässt sich nicht rückgängig machen – vorher sichern.</p>
+
+        <h2 id="de13">13. Sprache umschalten</h2>
+        <p>Oben rechts in der App schaltest du zwischen <strong>DE</strong> und <strong>EN</strong> um. Die Auswahl bleibt gespeichert, auch nach dem Schließen.</p>
+        <p>Deine Einträge bleiben dabei unverändert – nur die Beschriftungen wechseln. Du kannst die App also problemlos jemandem zeigen oder weitergeben, der kein Deutsch spricht.</p>
+
+        <h2 id="de14">14. Auf dem Handy nutzen</h2>
+        <p>Öffne <code>peterjaki.github.io/haushaltsbuch</code> im Handy-Browser. Über das Menü des Browsers kannst du <strong>"Zum Startbildschirm hinzufügen"</strong> wählen. Danach hast du ein eigenes Symbol wie bei einer richtigen App, und sie startet ohne Browser-Leiste.</p>
+
+        <h2 id="de15">15. Häufige Fragen</h2>
+        <h3>Kostet die App etwas?</h3>
+        <p>Nein. Keine Kosten, keine Werbung, keine Anmeldung.</p>
+        <h3>Brauche ich Internet?</h3>
+        <p>Nur beim allerersten Öffnen im Browser. Danach funktioniert alles auch offline. Das Desktop-Symbol arbeitet ohnehin komplett ohne Internet.</p>
+        <h3>Sieht jemand meine Zahlen?</h3>
+        <p>Nein. Alles bleibt auf deinem Gerät, es wird nichts übertragen oder gespeichert – auch nicht von mir.</p>
+        <h3>Ich sehe eine alte Version, obwohl etwas geändert wurde.</h3>
+        <p>Dann hat der Browser noch die alte Fassung gespeichert. Drücke <code>Strg</code> + <code>Umschalt</code> + <code>R</code>, dann wird neu geladen.</p>
+        <h3>Kann ich auch frühere Monate nachtragen?</h3>
+        <p>Ja. Geh mit <strong>← Vorheriger</strong> zum gewünschten Monat und trage dort ganz normal ein.</p>
+    </div>
+
+    <!-- ===================== ENGLISH ===================== -->
+    <div id="en" hidden>
+        <div class="toc">
+            <strong>Contents</strong>
+            <ol>
+                <li><a href="#en1">What is the Haushaltsbuch?</a></li>
+                <li><a href="#en2">Adding an entry</a></li>
+                <li><a href="#en3">Managing categories</a></li>
+                <li><a href="#en4">Fixed costs</a></li>
+                <li><a href="#en5">The summary: income, expenses, balance</a></li>
+                <li><a href="#en6">Savings progress &amp; budget</a></li>
+                <li><a href="#en7">Cancelled costs</a></li>
+                <li><a href="#en8">Month comparison</a></li>
+                <li><a href="#en9">Entries and switching months</a></li>
+                <li><a href="#en10">Year in review</a></li>
+                <li><a href="#en11">Hugo, your savings advisor</a></li>
+                <li><a href="#en12">Backing up and restoring your data</a></li>
+                <li><a href="#en13">Switching language</a></li>
+                <li><a href="#en14">Using it on your phone</a></li>
+                <li><a href="#en15">Frequently asked questions</a></li>
+            </ol>
+        </div>
+
+        <h2 id="en1">1. What is the Haushaltsbuch?</h2>
+        <p>The Haushaltsbuch ("household book") is your personal overview of income and expenses. You record what comes in and what goes out, and you can see where you stand at any time – for the month, compared with previous months, and across the whole year.</p>
+        <p>There are two ways to open it:</p>
+        <ul>
+            <li>The <strong>Haushaltsbuch</strong> icon on the desktop (works without internet)</li>
+            <li>In a browser at <code>peterjaki.github.io/haushaltsbuch</code> – on a phone too</li>
+        </ul>
+        <div class="box">
+            <strong>Important:</strong> Your data stays on the device where you enter it. Nothing is sent to the internet and nobody else can see it. But that also means entries made on the PC do <em>not</em> automatically appear on your phone. Chapter 12 explains how to transfer them.
+        </div>
+
+        <h2 id="en2">2. Adding an entry</h2>
+        <p>To record income or an expense:</p>
+        <ol>
+            <li><span class="step">Click a category</span> – for example 🛒 Groceries or 💵 Salary/Pension. The selected one gets a coloured border.</li>
+            <li><span class="step">Type the amount</span> – just the number, for example <code>42.50</code>.</li>
+            <li><span class="step">Click "Add"</span> – done. The entry appears in the list below straight away.</li>
+        </ol>
+        <div class="box tip">
+            <strong>Tip:</strong> A small ✓ on a category means you have already recorded something there this month.
+        </div>
+        <p>The app works out by itself whether something is income or an expense: 💵 Salary/Pension, 💰 Savings and 📈 Investments count as income, everything else as an expense.</p>
+
+        <h2 id="en3">3. Managing categories</h2>
+        <p>Use <strong>⚙️ Manage categories</strong> or the ➕ tile to create your own categories, for example "Hiking" or "Gifts".</p>
+        <p>The app picks a matching icon for you – type "dog" and you automatically get 🐕. You can also delete your own categories there.</p>
+
+        <h2 id="en4">4. Fixed costs</h2>
+        <p>Costs that are the same every month (rent, electricity, insurance) only need to be entered once:</p>
+        <ol>
+            <li>Create the entry as usual</li>
+            <li>Before adding it, tick <strong>🔁 Remember as fixed cost</strong></li>
+        </ol>
+        <p>From then on the app enters that amount for you automatically in every new month. Under <strong>🔁 Manage fixed costs</strong> you can see them all and remove them individually.</p>
+
+        <h2 id="en5">5. The summary: income, expenses, balance</h2>
+        <p>The three coloured cards at the top show, for the selected month:</p>
+        <table>
+            <tr><th>Card</th><th>Meaning</th></tr>
+            <tr><td>Income</td><td>Everything that came in</td></tr>
+            <tr><td>Expenses</td><td>Everything that went out</td></tr>
+            <tr><td>Balance</td><td>The difference. Green = money left over, red = you spent more than you received</td></tr>
+        </table>
+
+        <h2 id="en6">6. Savings progress &amp; budget</h2>
+
+        <h3>💰 Savings goal</h3>
+        <p>Enter how much you would like to save per month. The bar shows how far along you are. What counts as "saved" is your balance, i.e. what is left at the end of the month.</p>
+
+        <h3>🪙 Emergency fund goal</h3>
+        <p>This is your cushion for emergencies. If you leave it empty, Hugo assumes three months of expenses. Since that is unrealistically high for many people, you can set your own target here.</p>
+
+        <h3>🛒 Grocery budget</h3>
+        <p>Set how much you want to spend on groceries per month (200 € by default). The bar fills up with every entry in the 🛒 Groceries category and changes colour:</p>
+        <table>
+            <tr><th>Colour</th><th>Meaning</th></tr>
+            <tr><td>Turquoise</td><td>Well within budget</td></tr>
+            <tr><td>Yellow</td><td>From 80 % – getting tight</td></tr>
+            <tr><td>Red</td><td>Budget exceeded</td></tr>
+        </table>
+        <p>Below it you always see how much money is left – or by how much you are over.</p>
+
+        <h3>📅 Daily budget</h3>
+        <p>Shows how much you can still spend per day from today on without ending the month in the red. The app counts the remaining days of the month.</p>
+
+        <h2 id="en7">7. Cancelled costs</h2>
+        <p>Here you collect everything you have cancelled or unsubscribed from – a subscription or a membership, for example.</p>
+        <ol>
+            <li>Enter the name (e.g. "Gym membership")</li>
+            <li>Enter the amount</li>
+            <li>Choose <strong>per year</strong> or <strong>per month</strong></li>
+        </ol>
+        <p>The app converts both automatically and shows how much you save <strong>per month</strong> and <strong>per year</strong>. The total grows with every cancellation – nicely motivating.</p>
+
+        <h2 id="en8">8. Month comparison</h2>
+        <p>The bar chart compares the current month with the previous one, broken down by category. You can see immediately where you spent more or less than last time.</p>
+
+        <h2 id="en9">9. Entries and switching months</h2>
+        <p>Use <strong>← Previous</strong> and <strong>Next →</strong> at the top to change month. Each month has its own entries.</p>
+        <p>The <strong>📋 Entries</strong> list shows all bookings of the month, newest first. The bin icon deletes a single entry.</p>
+
+        <h2 id="en10">10. Year in review</h2>
+        <p>The <strong>📅 Year in review</strong> button opens a summary of the whole year:</p>
+        <ul>
+            <li>Income and expenses for the year</li>
+            <li>How much you saved in total</li>
+            <li>Your biggest spending category</li>
+            <li>Your best and your weakest month</li>
+        </ul>
+
+        <h2 id="en11">11. Hugo, your savings advisor</h2>
+        <p>🧑‍💼 <strong>Hugo</strong> sits in the bottom right corner. Click him and ask questions in plain language. He calculates with your real numbers – no internet needed.</p>
+        <p>Things he understands:</p>
+        <ul>
+            <li><em>"How does it look?"</em> – an overview of your current situation</li>
+            <li><em>"Where can I save?"</em> – concrete suggestions calculated from your categories</li>
+            <li><em>"How much should I save?"</em> – your savings rate</li>
+            <li><em>"What about my emergency fund?"</em> – how far your cushion goes</li>
+            <li><em>"What are my subscriptions?"</em> – an overview of your recurring costs</li>
+            <li><em>"What is the 3-account method?"</em> – a simple savings method explained</li>
+            <li><em>"What can I spend today?"</em> – your daily budget</li>
+        </ul>
+        <p>Hugo also warns you on his own when you spend noticeably more in a category than usual, and congratulates you on every cancellation.</p>
+
+        <h2 id="en12">12. Backing up and restoring your data</h2>
+        <div class="box warn">
+            <strong>This is the most important chapter.</strong> Your data only lives on this one device. If you clear your browser history including website data, or the PC breaks, the entries are gone – unless you made a backup.
+        </div>
+        <p><strong>Backup:</strong> Click <strong>💾 Export data</strong>. A file containing everything is downloaded (named e.g. <code>haushaltsbuch-2026-09-18.json</code>). Keep it somewhere you will find it again.</p>
+        <p><strong>Restore or transfer:</strong> Click <strong>📂 Import data</strong> and select exactly that file. This is also how you move your entries from PC to phone or back.</p>
+        <div class="box tip">
+            <strong>Recommendation:</strong> Export once a month, for example on the first of the month when you check your fixed costs.
+        </div>
+
+        <h3>🗑️ Delete month</h3>
+        <p>The red button deletes <strong>all entries of the month currently shown</strong>. Other months are untouched. This cannot be undone – make a backup first.</p>
+
+        <h2 id="en13">13. Switching language</h2>
+        <p>At the top right of the app you switch between <strong>DE</strong> and <strong>EN</strong>. Your choice is remembered, even after closing the app.</p>
+        <p>Your entries stay exactly as they are – only the labels change. So you can show or pass on the app to someone who does not speak German.</p>
+
+        <h2 id="en14">14. Using it on your phone</h2>
+        <p>Open <code>peterjaki.github.io/haushaltsbuch</code> in your phone's browser. In the browser menu choose <strong>"Add to home screen"</strong>. You then get your own icon just like a real app, and it starts without the browser bar.</p>
+
+        <h2 id="en15">15. Frequently asked questions</h2>
+        <h3>Does the app cost anything?</h3>
+        <p>No. No cost, no adverts, no sign-up.</p>
+        <h3>Do I need internet?</h3>
+        <p>Only the very first time you open it in a browser. After that everything works offline too. The desktop icon works entirely without internet anyway.</p>
+        <h3>Can anyone see my figures?</h3>
+        <p>No. Everything stays on your device, nothing is transmitted or stored elsewhere.</p>
+        <h3>I see an old version although something was changed.</h3>
+        <p>Your browser still has the old version stored. Press <code>Ctrl</code> + <code>Shift</code> + <code>R</code> to reload it properly.</p>
+        <h3>Can I add entries for earlier months?</h3>
+        <p>Yes. Use <strong>← Previous</strong> to go to the month you want and enter them there as usual.</p>
+    </div>
+
+    <footer>
+        <span data-foot-de="Haushaltsbuch – Handbuch · Stand: September 2026"
+              data-foot-en="Haushaltsbuch – Manual · Last updated: September 2026">Haushaltsbuch – Handbuch · Stand: September 2026</span>
+    </footer>
+
+</div>
+
+<script>
+    function setLang(lang) {
+        document.getElementById('de').hidden = lang !== 'de';
+        document.getElementById('en').hidden = lang !== 'en';
+        document.getElementById('btnDe').classList.toggle('active', lang === 'de');
+        document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+        document.documentElement.lang = lang;
+        document.title = lang === 'de' ? 'Haushaltsbuch – Handbuch' : 'Haushaltsbuch – Manual';
+
+        var sub = document.querySelector('.subtitle');
+        sub.textContent = sub.getAttribute('data-sub-' + lang);
+        var foot = document.querySelector('footer span');
+        foot.textContent = foot.getAttribute('data-foot-' + lang);
+
+        try { localStorage.setItem('handbuch-lang', lang); } catch (e) {}
+    }
+
+    try {
+        var saved = localStorage.getItem('handbuch-lang');
+        if (saved === 'en') setLang('en');
+    } catch (e) {}
+</script>
+</body>
+</html>
