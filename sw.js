@@ -1,17 +1,20 @@
-const CACHE_NAME = 'haushaltsbuch-v3';
+const CACHE_NAME = 'haushaltsbuch-v4';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192x192.png',
+  './icon-512x512.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS).catch(() => {
-        return Promise.resolve();
-      });
+      return Promise.all(
+        ASSETS.map(asset => cache.add(asset).catch(() => {}))
+      );
     })
   );
 });
