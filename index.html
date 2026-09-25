@@ -1098,7 +1098,7 @@
                 </div>
 
                 <label class="recurring-check">
-                    <input type="checkbox" id="markRecurring">
+                    <input type="checkbox" id="markRecurring" checked>
                     <span data-i18n="recurringCheckLabel">🔁 Als feste Kosten merken (wird jeden Monat automatisch eingetragen)</span>
                 </label>
 
@@ -1120,7 +1120,7 @@
                         <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Notgroschen-Ziel (€)" data-i18n-ph="notgroschenPlaceholder">
                         <button onclick="app.setNotgroschenTarget()" data-i18n="saveBtn">Speichern</button>
                     </div>
-                    <p class="hint-text hint-small" style="margin-top: 8px;" data-i18n="notgroschenHint">💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.</p>
+                    <p class="hint-text hint-small" style="margin-top: 8px;" data-i18n="notgroschenHint">💡 Leg hier dein persönliches Notgroschen-Ziel fest, was für dich realistisch ist.</p>
                 </div>
 
                 <div class="progress-item" id="savingsProgress" style="display: none;">
@@ -1257,7 +1257,7 @@
             monthlyGoalPlaceholder: { de: 'Monatliches Sparziel (€)', en: 'Monthly savings goal (€)' },
             saveBtn: { de: 'Speichern', en: 'Save' },
             notgroschenPlaceholder: { de: 'Dein eigenes Notgroschen-Ziel (€)', en: 'Your own emergency fund goal (€)' },
-            notgroschenHint: { de: '💡 Ohne eigene Angabe rechnet Hugo automatisch mit 3 Monatsausgaben – leg hier fest, was für dich realistisch ist.', en: "💡 Without your own input, Hugo automatically calculates 3 months of expenses — set what's realistic for you here." },
+            notgroschenHint: { de: '💡 Leg hier dein persönliches Notgroschen-Ziel fest, was für dich realistisch ist.', en: '💡 Set your own emergency fund goal here — whatever is realistic for you.' },
             savingsGoalLabel: { de: '💰 Sparziel', en: '💰 Savings goal' },
             groceryBudgetPlaceholder: { de: 'Lebensmittel-Budget pro Monat (€)', en: 'Grocery budget per month (€)' },
             groceryBudgetLabel: { de: '🛒 Lebensmittel-Budget', en: '🛒 Grocery budget' },
@@ -1365,6 +1365,7 @@
         const app = {
             data: {},
             currentDate: new Date(),
+            followingToday: true,
             settings: {},
             customCategories: [],
             cancelledCosts: [],
@@ -1396,6 +1397,20 @@
                 document.getElementById('cancelledAmount').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addCancelledCost();
                 });
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') this.syncToCurrentMonth();
+                });
+                window.addEventListener('focus', () => this.syncToCurrentMonth());
+                setInterval(() => this.syncToCurrentMonth(), 60000);
+            },
+
+            syncToCurrentMonth() {
+                if (!this.followingToday) return;
+                const todayKey = this.getKeyFor(new Date());
+                if (this.getMonthKey() !== todayKey) {
+                    this.currentDate = new Date();
+                    this.render();
+                }
             },
 
             getKeyFor(date) {
@@ -1451,11 +1466,13 @@
 
             previousMonth() {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                this.followingToday = this.getMonthKey() === this.getKeyFor(new Date());
                 this.render();
             },
 
             nextMonth() {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.followingToday = this.getMonthKey() === this.getKeyFor(new Date());
                 this.render();
             },
 
@@ -1481,7 +1498,6 @@
                 const markRecurring = document.getElementById('markRecurring');
                 if (markRecurring && markRecurring.checked) {
                     this.addRecurringCost(entry.category, entry.amount);
-                    markRecurring.checked = false;
                 }
 
                 document.getElementById('amount').value = '';
@@ -2243,21 +2259,6 @@
                 return total;
             },
 
-            getAvgMonthlyExpenses() {
-                const monthKeys = Object.keys(app.data).filter(k => app.data[k] && app.data[k].length > 0);
-                if (monthKeys.length === 0) return 0;
-
-                let total = 0;
-                monthKeys.forEach(key => {
-                    app.data[key].forEach(e => {
-                        if (!(e.category.includes('💵') || e.category.includes('💰') || e.category.includes('📈'))) {
-                            total += e.amount;
-                        }
-                    });
-                });
-                return total / monthKeys.length;
-            },
-
             getSuggestedSavingsRate() {
                 const { balance } = this.getStats();
                 if (balance <= 0) return 0;
@@ -2266,19 +2267,13 @@
 
             getNotgroschenStatus() {
                 const fund = this.getEmergencyFund();
-                const avgExpenses = this.getAvgMonthlyExpenses();
                 const customTarget = app.settings.notgroschenTarget;
-                const target = (customTarget !== undefined && customTarget !== null && customTarget > 0) ? customTarget : avgExpenses * 3;
+                const target = (customTarget !== undefined && customTarget !== null && customTarget > 0) ? customTarget : 0;
                 return { fund, target, reached: target > 0 ? fund >= target : false, missing: Math.max(0, target - fund) };
             },
 
             getNotgroschenLabel() {
-                const customTarget = app.settings.notgroschenTarget;
-                const hasCustom = customTarget !== undefined && customTarget !== null && customTarget > 0;
-                if (app.lang === 'en') {
-                    return hasCustom ? 'your personal goal' : 'approx. 3 months of expenses';
-                }
-                return hasCustom ? 'dein persönliches Ziel' : 'ca. 3 Monatsausgaben';
+                return app.lang === 'en' ? 'your personal goal' : 'dein persönliches Ziel';
             },
 
             getGreeting() {
@@ -2558,8 +2553,8 @@
                     const notgroschen = this.getNotgroschenStatus();
                     if (notgroschen.target === 0) {
                         return en
-                            ? "I need a bit more data from you for that. Add your expenses over a few months, and I can tell you how big your emergency fund should be! 📝"
-                            : 'Dazu brauch ich ein bisschen mehr Daten von dir. Trag über ein paar Monate deine Ausgaben ein, dann kann ich dir sagen, wie groß dein Notgroschen sein sollte! 📝';
+                            ? 'You haven\'t set an emergency fund goal yet. Enter your own target (€) under "Savings Progress & Budget" and I\'ll track your progress! 📝'
+                            : 'Du hast noch kein Notgroschen-Ziel festgelegt. Trag dein eigenes Ziel (€) bei "Sparfortschritt & Budget" ein, dann behalte ich deinen Fortschritt im Blick! 📝';
                     }
                     if (notgroschen.reached) {
                         return en
