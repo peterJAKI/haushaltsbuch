@@ -1112,15 +1112,17 @@
                 <h2 class="section-title" data-i18n="progressTitle">🎯 Sparfortschritt & Budget</h2>
 
                 <div class="goal-input-wrapper">
+                    <label class="hint-text hint-small" for="monthlyGoal" data-i18n="monthlyGoalFieldLabel">💰 Monatliches Sparziel</label>
                     <div class="goal-input-group">
                         <input type="text" inputmode="decimal" id="monthlyGoal" placeholder="Monatliches Sparziel (€)" data-i18n-ph="monthlyGoalPlaceholder">
                         <button onclick="app.setMonthlyGoal()" data-i18n="saveBtn">Speichern</button>
                     </div>
+                    <label class="hint-text hint-small" for="notgroschenTarget" style="margin-top: 12px; display: block;" data-i18n="notgroschenFieldLabel">🛡️ Sicherheitspuffer-Ziel</label>
                     <div class="goal-input-group">
-                        <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Notgroschen-Ziel (€)" data-i18n-ph="notgroschenPlaceholder">
+                        <input type="text" inputmode="decimal" id="notgroschenTarget" placeholder="Dein eigenes Sicherheitspuffer-Ziel (€)" data-i18n-ph="notgroschenPlaceholder">
                         <button onclick="app.setNotgroschenTarget()" data-i18n="saveBtn">Speichern</button>
                     </div>
-                    <p class="hint-text hint-small" style="margin-top: 8px;" data-i18n="notgroschenHint">💡 Leg hier dein persönliches Notgroschen-Ziel fest, was für dich realistisch ist.</p>
+                    <p class="hint-text hint-small" style="margin-top: 8px;" data-i18n="notgroschenHint">💡 Leg hier dein persönliches Sicherheitspuffer-Ziel fest, was für dich realistisch ist.</p>
                 </div>
 
                 <div class="progress-item" id="savingsProgress" style="display: none;">
@@ -1234,10 +1236,12 @@
             amountHint: { de: '💡 Tippe einfach die Summe ein und klick "Hinzufügen"', en: '💡 Just type the amount and click "Add"' },
             manageRecurringBtn: { de: '🔁 Feste Kosten verwalten', en: '🔁 Manage fixed costs' },
             progressTitle: { de: '🎯 Sparfortschritt & Budget', en: '🎯 Savings Progress & Budget' },
+            monthlyGoalFieldLabel: { de: '💰 Monatliches Sparziel', en: '💰 Monthly savings goal' },
             monthlyGoalPlaceholder: { de: 'Monatliches Sparziel (€)', en: 'Monthly savings goal (€)' },
             saveBtn: { de: 'Speichern', en: 'Save' },
-            notgroschenPlaceholder: { de: 'Dein eigenes Notgroschen-Ziel (€)', en: 'Your own emergency fund goal (€)' },
-            notgroschenHint: { de: '💡 Leg hier dein persönliches Notgroschen-Ziel fest, was für dich realistisch ist.', en: '💡 Set your own emergency fund goal here — whatever is realistic for you.' },
+            notgroschenFieldLabel: { de: '🛡️ Sicherheitspuffer-Ziel', en: '🛡️ Emergency fund goal' },
+            notgroschenPlaceholder: { de: 'Dein eigenes Sicherheitspuffer-Ziel (€)', en: 'Your own emergency fund goal (€)' },
+            notgroschenHint: { de: '💡 Leg hier dein persönliches Sicherheitspuffer-Ziel fest, was für dich realistisch ist.', en: '💡 Set your own emergency fund goal here — whatever is realistic for you.' },
             savingsGoalLabel: { de: '💰 Sparziel', en: '💰 Savings goal' },
             dailyBudgetLabel: { de: '📅 Tagesbudget', en: '📅 Daily budget' },
             cancelledTitle: { de: '❌ Gekündigte Kosten', en: '❌ Cancelled Costs' },
@@ -2255,11 +2259,11 @@
                 if (!notgroschen.reached && notgroschen.target > 0) {
                     msg += en
                         ? `Before investing: you should first build an <strong>emergency fund</strong> for emergencies (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). You currently have ${notgroschen.fund.toFixed(2)}€ set aside – still <strong>${notgroschen.missing.toFixed(2)}€</strong> missing. Best to set some aside right away (category "💰 Savings")!`
-                        : `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Notgroschen</strong> für Notfälle haben (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
+                        : `Bevor's ans Investieren geht: Du solltest erstmal einen <strong>Sicherheitspuffer</strong> für Notfälle haben (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€). Aktuell hast du ${notgroschen.fund.toFixed(2)}€ dafür beiseite gelegt – da fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Leg am besten gleich einen Teil auf die Seite (Kategorie "💰 Sparen")!`;
                 } else if (suggested > 0) {
                     msg += en
                         ? `Calculated from your current surplus: I suggest setting aside <strong>${suggested}€</strong> right away (savings first, then the rest for living – the "pay yourself first" method). Your emergency fund is already covered, so you could put this straight into an ETF savings plan at Trade Republic! 📈`
-                        : `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Notgroschen steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
+                        : `Berechnet auf Basis deines aktuellen Überschusses: Ich schlage vor, <strong>${suggested}€</strong> davon direkt beiseite zu legen (das Konto zuerst, dann der Rest fürs Leben – "Zuerst sparen"-Methode). Dein Sicherheitspuffer steht schon, also könntest du das auch direkt in einen ETF-Sparplan bei Trade Republic packen! 📈`;
                 } else {
                     msg += en
                         ? "Take a look at what's left after fixed costs – then I can suggest a concrete savings rate!"
@@ -2449,11 +2453,11 @@
                     if (!notgroschen.reached && notgroschen.target > 0) {
                         tips.push(en
                             ? `✅ You have <strong>${balance.toFixed(2)}€ left</strong> this month. Before investing: build an <strong>emergency fund</strong> first (goal: ${notgroschen.target.toFixed(2)}€, you already have ${notgroschen.fund.toFixed(2)}€) – <strong>${notgroschen.missing.toFixed(2)}€</strong> still missing as a safety buffer.`
-                            : `✅ Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (Ziel: ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€) – noch <strong>${notgroschen.missing.toFixed(2)}€</strong> fehlen als Sicherheitspuffer für Notfälle.`);
+                            : `✅ Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Bevor's ans Investieren geht: Bau dir erst einen <strong>Sicherheitspuffer</strong> auf (Ziel: ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€) – noch <strong>${notgroschen.missing.toFixed(2)}€</strong> fehlen für Notfälle.`);
                     } else {
                         tips.push(en
                             ? `✅ Going well! You have <strong>${balance.toFixed(2)}€ left</strong> this month. Calculated suggestion: save <strong>${suggested}€</strong> of it, keep the rest as a buffer. Your emergency fund is covered – you could put this into an ETF savings plan at Trade Republic!`
-                            : `✅ Läuft gut! Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Berechnet vorgeschlagen: <strong>${suggested}€</strong> davon sparen, den Rest als Puffer lassen. Dein Notgroschen steht schon – das könntest du auch in einen ETF-Sparplan bei Trade Republic stecken!`);
+                            : `✅ Läuft gut! Du hast diesen Monat <strong>${balance.toFixed(2)}€ übrig</strong>. Berechnet vorgeschlagen: <strong>${suggested}€</strong> davon sparen, den Rest als Puffer lassen. Dein Sicherheitspuffer steht schon – das könntest du auch in einen ETF-Sparplan bei Trade Republic stecken!`);
                     }
                 }
 
@@ -2496,16 +2500,16 @@
                     if (notgroschen.target === 0) {
                         return en
                             ? 'You haven\'t set an emergency fund goal yet. Enter your own target (€) under "Savings Progress & Budget" and I\'ll track your progress! 📝'
-                            : 'Du hast noch kein Notgroschen-Ziel festgelegt. Trag dein eigenes Ziel (€) bei "Sparfortschritt & Budget" ein, dann behalte ich deinen Fortschritt im Blick! 📝';
+                            : 'Du hast noch kein Sicherheitspuffer-Ziel festgelegt. Trag dein eigenes Ziel (€) bei "Sparfortschritt & Budget" ein, dann behalte ich deinen Fortschritt im Blick! 📝';
                     }
                     if (notgroschen.reached) {
                         return en
                             ? `✅ Your emergency fund is set! You've set aside <strong>${notgroschen.fund.toFixed(2)}€</strong> (goal was ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). You're covered for emergencies – now you can think about investing! 📈`
-                            : `✅ Dein Notgroschen steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
+                            : `✅ Dein Sicherheitspuffer steht! Du hast <strong>${notgroschen.fund.toFixed(2)}€</strong> beiseite gelegt (Ziel war ${notgroschen.target.toFixed(2)}€ = ${this.getNotgroschenLabel()}). Damit bist du für Notfälle abgesichert – jetzt kannst du ans Investieren denken! 📈`;
                     }
                     return en
                         ? `🛡️ Your emergency fund goal is <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). You've already set aside ${notgroschen.fund.toFixed(2)}€, still <strong>${notgroschen.missing.toFixed(2)}€</strong> missing. That's your buffer for emergencies, before investing! You can adjust this goal anytime under "Savings Progress & Budget".`
-                        : `🛡️ Dein Notgroschen-Ziel liegt bei <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht! Du kannst das Ziel übrigens jederzeit bei "Sparfortschritt & Budget" selbst anpassen.`;
+                        : `🛡️ Dein Sicherheitspuffer-Ziel liegt bei <strong>${notgroschen.target.toFixed(2)}€</strong> (${this.getNotgroschenLabel()}). Du hast schon ${notgroschen.fund.toFixed(2)}€ beiseite gelegt, fehlen noch <strong>${notgroschen.missing.toFixed(2)}€</strong>. Das ist dein Puffer für Notfälle, bevor's ans Investieren geht! Du kannst das Ziel übrigens jederzeit bei "Sparfortschritt & Budget" selbst anpassen.`;
                 }
 
                 if (q.includes('sparrate') || (q.includes('wie viel') && q.includes('spar')) ||
@@ -2550,12 +2554,12 @@
                     if (!notgroschen.reached && notgroschen.target > 0) {
                         return en
                             ? `📈 Before investing: build an <strong>emergency fund</strong> first (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, you already have ${notgroschen.fund.toFixed(2)}€, ${notgroschen.missing.toFixed(2)}€ still missing). That's your safety buffer for emergencies – washing machine breaks, car repair, etc. Only once that's covered does investing really make sense! 😊`
-                            : `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Notgroschen</strong> auf (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Sicherheitspuffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
+                            : `📈 Bevor's ans Investieren geht: Bau dir erst einen <strong>Sicherheitspuffer</strong> auf (${this.getNotgroschenLabel()} = ${notgroschen.target.toFixed(2)}€, du hast schon ${notgroschen.fund.toFixed(2)}€, fehlen noch ${notgroschen.missing.toFixed(2)}€). Das ist dein Puffer für Notfälle – Waschmaschine kaputt, Auto-Reparatur usw. Erst wenn der steht, macht Investieren richtig Sinn! 😊`;
                     }
 
                     let msg = en
                         ? `📈 Your emergency fund is already covered – nice! You're already with <strong>Trade Republic</strong>. A broad ETF savings plan (e.g. on the MSCI World), set up <strong>automatically monthly</strong>, is a simple way to get more out of your money long-term than a savings account.`
-                        : `📈 Dein Notgroschen steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
+                        : `📈 Dein Sicherheitspuffer steht schon – nice! Du bist ja schon bei <strong>Trade Republic</strong>. Ein breiter ETF-Sparplan (z.B. auf den MSCI World), <strong>automatisch monatlich</strong> eingerichtet, ist eine simple Möglichkeit, langfristig mehr aus deinem Geld rauszuholen als auf dem Sparbuch.`;
                     if (suggested > 0) {
                         msg += en
                             ? ` Calculated from your current surplus, you could move e.g. <strong>${suggested}€/month</strong> automatically into the savings plan.`
