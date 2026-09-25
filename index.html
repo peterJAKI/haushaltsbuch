@@ -1136,26 +1136,6 @@
                     </div>
                 </div>
 
-                <div class="goal-input-wrapper">
-                    <div class="goal-input-group">
-                        <input type="text" inputmode="decimal" id="groceryBudget" placeholder="Lebensmittel-Budget pro Monat (€)" data-i18n-ph="groceryBudgetPlaceholder">
-                        <button onclick="app.setGroceryBudget()" data-i18n="saveBtn">Speichern</button>
-                    </div>
-                </div>
-
-                <div class="progress-item" id="groceryProgress" style="display: none;">
-                    <div class="progress-label">
-                        <span data-i18n="groceryBudgetLabel">🛒 Lebensmittel-Budget</span>
-                        <span id="groceryPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="groceryFill" style="width: 0%"></div>
-                    </div>
-                    <div class="hint-text hint-small">
-                        <span id="groceryText">0€ / 0€</span>
-                    </div>
-                </div>
-
                 <div class="progress-item">
                     <div class="progress-label">
                         <span data-i18n="dailyBudgetLabel">📅 Tagesbudget</span>
@@ -1259,8 +1239,6 @@
             notgroschenPlaceholder: { de: 'Dein eigenes Notgroschen-Ziel (€)', en: 'Your own emergency fund goal (€)' },
             notgroschenHint: { de: '💡 Leg hier dein persönliches Notgroschen-Ziel fest, was für dich realistisch ist.', en: '💡 Set your own emergency fund goal here — whatever is realistic for you.' },
             savingsGoalLabel: { de: '💰 Sparziel', en: '💰 Savings goal' },
-            groceryBudgetPlaceholder: { de: 'Lebensmittel-Budget pro Monat (€)', en: 'Grocery budget per month (€)' },
-            groceryBudgetLabel: { de: '🛒 Lebensmittel-Budget', en: '🛒 Grocery budget' },
             dailyBudgetLabel: { de: '📅 Tagesbudget', en: '📅 Daily budget' },
             cancelledTitle: { de: '❌ Gekündigte Kosten', en: '❌ Cancelled Costs' },
             cancelledSubtitle: { de: 'Was hast du gekündigt oder abbestellt, um Geld zu sparen?', en: 'What did you cancel to save money?' },
@@ -1390,9 +1368,6 @@
                 });
                 document.getElementById('notgroschenTarget').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.setNotgroschenTarget();
-                });
-                document.getElementById('groceryBudget').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.setGroceryBudget();
                 });
                 document.getElementById('cancelledAmount').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addCancelledCost();
@@ -1691,7 +1666,6 @@
             loadSettings() {
                 const stored = localStorage.getItem('haushaltsbuch-settings');
                 this.settings = stored ? JSON.parse(stored) : { monthlyGoal: 0 };
-                if (this.settings.groceryBudget === undefined) this.settings.groceryBudget = 200;
             },
 
             loadLang() {
@@ -2006,16 +1980,6 @@
                 }
             },
 
-            setGroceryBudget() {
-                const input = document.getElementById('groceryBudget');
-                const value = this.parseAmount(input.value);
-                if (value >= 0) {
-                    this.settings.groceryBudget = value;
-                    this.saveSettings();
-                    this.render();
-                }
-            },
-
             render() {
                 this.renderMonthSelector();
                 this.renderCategories();
@@ -2089,7 +2053,6 @@
                 progressSection.style.display = 'block';
                 document.getElementById('monthlyGoal').value = goal > 0 ? goal : '';
                 document.getElementById('notgroschenTarget').value = this.settings.notgroschenTarget > 0 ? this.settings.notgroschenTarget : '';
-                document.getElementById('groceryBudget').value = this.settings.groceryBudget > 0 ? this.settings.groceryBudget : '';
 
                 if (goal > 0) {
                     const saved = Math.max(0, balance);
@@ -2100,27 +2063,6 @@
                     document.getElementById('savingsText').textContent = `${saved.toFixed(2)}€ / ${goal.toFixed(2)}€`;
                 } else {
                     document.getElementById('savingsProgress').style.display = 'none';
-                }
-
-                const groceryBudget = this.settings.groceryBudget || 0;
-                if (groceryBudget > 0) {
-                    const spent = this.getMonthData()
-                        .filter(e => e.category === '🛒 Lebensmittel')
-                        .reduce((sum, e) => sum + e.amount, 0);
-                    const groceryPercent = Math.round((spent / groceryBudget) * 100);
-                    const groceryFill = document.getElementById('groceryFill');
-                    document.getElementById('groceryProgress').style.display = 'block';
-                    groceryFill.style.width = Math.min(groceryPercent, 100) + '%';
-                    groceryFill.style.background = groceryPercent >= 100
-                        ? 'var(--danger)'
-                        : (groceryPercent >= 80 ? 'linear-gradient(90deg, var(--gold), var(--danger))' : 'linear-gradient(90deg, var(--accent), var(--gold))');
-                    document.getElementById('groceryPercent').textContent = groceryPercent + '%';
-                    const remaining = groceryBudget - spent;
-                    document.getElementById('groceryText').textContent = remaining >= 0
-                        ? `${spent.toFixed(2)}€ / ${groceryBudget.toFixed(2)}€ (${this.lang === 'en' ? 'remaining' : 'übrig'}: ${remaining.toFixed(2)}€)`
-                        : `${spent.toFixed(2)}€ / ${groceryBudget.toFixed(2)}€ (${this.lang === 'en' ? 'over by' : 'überzogen um'}: ${Math.abs(remaining).toFixed(2)}€)`;
-                } else {
-                    document.getElementById('groceryProgress').style.display = 'none';
                 }
 
                 const daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
