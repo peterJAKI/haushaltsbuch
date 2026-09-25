@@ -1281,9 +1281,13 @@
             yrBestMonth: { de: 'Bester Monat', en: 'Best month' },
             yrWorstMonth: { de: 'Schwierigster Monat', en: 'Hardest month' },
             yrEmpty: { de: 'Noch keine Daten für dieses Jahr vorhanden. Trag ein paar Einträge ein, dann gibt es hier am Jahresende eine schöne Übersicht! 📊', en: 'No data for this year yet. Add a few entries, and you\'ll get a nice overview here at year-end! 📊' },
-            manageCategoriesHeader: { de: '⚙️ Eigene Kategorien', en: '⚙️ Custom Categories' },
+            manageCategoriesHeader: { de: '⚙️ Kategorien verwalten', en: '⚙️ Manage Categories' },
+            defaultCategoriesHeader: { de: 'Standard-Kategorien', en: 'Default categories' },
+            customCategoriesSubheader: { de: 'Eigene Kategorien', en: 'Custom categories' },
             noCustomCategories: { de: 'Du hast noch keine eigenen Kategorien hinzugefügt. Klick auf "+ Kategorie" unter der Liste, um eine anzulegen.', en: 'You haven\'t added any custom categories yet. Click "+ Category" below the list to create one.' },
             removeBtn: { de: '✕ Entfernen', en: '✕ Remove' },
+            hideBtn: { de: 'Ausblenden', en: 'Hide' },
+            showBtn: { de: 'Einblenden', en: 'Show' },
             manageRecurringHeader: { de: '🔁 Feste Kosten', en: '🔁 Fixed Costs' },
             noRecurringCosts: { de: 'Noch keine festen Kosten hinterlegt. Setz beim nächsten Eintrag den Haken bei "Als feste Kosten merken", dann erscheint er hier und wird ab dem nächsten Monat automatisch eingetragen.', en: 'No fixed costs saved yet. Check "Remember as fixed cost" on your next entry, and it will appear here and be added automatically from next month on.' },
             perMonthShort: { de: '/Monat', en: '/month' },
@@ -1350,6 +1354,7 @@
             followingToday: true,
             settings: {},
             customCategories: [],
+            hiddenCategories: [],
             cancelledCosts: [],
             recurringCosts: [],
             lang: 'de',
@@ -1358,6 +1363,7 @@
                 this.loadLang();
                 this.loadSettings();
                 this.loadCustomCategories();
+                this.loadHiddenCategories();
                 this.loadCancelledCosts();
                 this.loadRecurringCosts();
                 this.loadData();
@@ -1714,6 +1720,15 @@
                 this.customCategories = stored ? JSON.parse(stored) : [];
             },
 
+            loadHiddenCategories() {
+                const stored = localStorage.getItem('haushaltsbuch-hidden-categories');
+                this.hiddenCategories = stored ? JSON.parse(stored) : [];
+            },
+
+            saveHiddenCategories() {
+                localStorage.setItem('haushaltsbuch-hidden-categories', JSON.stringify(this.hiddenCategories));
+            },
+
             loadCancelledCosts() {
                 const stored = localStorage.getItem('haushaltsbuch-cancelled-costs');
                 this.cancelledCosts = stored ? JSON.parse(stored) : [];
@@ -1935,10 +1950,22 @@
                 const header = document.querySelector('.year-review-header span');
                 header.textContent = this.t('manageCategoriesHeader');
 
-                if (this.customCategories.length === 0) {
-                    body.innerHTML = `<p>${this.t('noCustomCategories')}</p>`;
-                } else {
-                    body.innerHTML = this.customCategories.map((cat, i) => {
+                const defaultRows = CATEGORIES.map((cat, i) => {
+                    const { icon, label } = this.splitCategory(cat);
+                    const isHidden = this.hiddenCategories.includes(cat);
+                    return `
+                        <div class="yr-stat">
+                            <span${isHidden ? ' style="opacity: 0.5;"' : ''}>${icon} ${label}</span>
+                            ${isHidden
+                                ? `<button class="remove-btn" onclick="app.showCategory(${i})">${this.t('showBtn')}</button>`
+                                : `<button class="remove-btn" onclick="app.hideCategory(${i})">${this.t('hideBtn')}</button>`}
+                        </div>
+                    `;
+                }).join('');
+
+                const customRows = this.customCategories.length === 0
+                    ? `<p>${this.t('noCustomCategories')}</p>`
+                    : this.customCategories.map((cat, i) => {
                         const { icon, label } = this.splitCategory(cat);
                         return `
                         <div class="yr-stat">
@@ -1947,9 +1974,33 @@
                         </div>
                     `;
                     }).join('');
-                }
+
+                body.innerHTML = `
+                    <h3 class="section-title" style="font-size: 1rem; margin-top: 0;">${this.t('defaultCategoriesHeader')}</h3>
+                    ${defaultRows}
+                    <h3 class="section-title" style="font-size: 1rem;">${this.t('customCategoriesSubheader')}</h3>
+                    ${customRows}
+                `;
 
                 document.getElementById('yearReviewOverlay').classList.remove('hidden');
+            },
+
+            hideCategory(index) {
+                const cat = CATEGORIES[index];
+                if (!this.hiddenCategories.includes(cat)) {
+                    this.hiddenCategories.push(cat);
+                    this.saveHiddenCategories();
+                }
+                this.renderCategories();
+                this.manageCategories();
+            },
+
+            showCategory(index) {
+                const cat = CATEGORIES[index];
+                this.hiddenCategories = this.hiddenCategories.filter(c => c !== cat);
+                this.saveHiddenCategories();
+                this.renderCategories();
+                this.manageCategories();
             },
 
             deleteCustomCategory(index) {
@@ -2015,7 +2066,7 @@
 
             renderCategories() {
                 const container = document.getElementById('categories');
-                const allCategories = [...CATEGORIES, ...this.customCategories];
+                const allCategories = [...CATEGORIES, ...this.customCategories].filter(cat => !this.hiddenCategories.includes(cat));
                 const usedCategories = new Set(this.getMonthData().map(e => e.category));
                 container.innerHTML = allCategories.map(cat => {
                     const { icon, label } = this.splitCategory(cat);
