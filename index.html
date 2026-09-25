@@ -2056,9 +2056,9 @@
 
                 if (goal > 0) {
                     const saved = Math.max(0, balance);
-                    const percent = Math.round((saved / goal) * 100);
+                    const percent = Math.min(Math.round((saved / goal) * 100), 100);
                     document.getElementById('savingsProgress').style.display = 'block';
-                    document.getElementById('savingsFill').style.width = Math.min(percent, 100) + '%';
+                    document.getElementById('savingsFill').style.width = percent + '%';
                     document.getElementById('savingsPercent').textContent = percent + '%';
                     document.getElementById('savingsText').textContent = `${saved.toFixed(2)}€ / ${goal.toFixed(2)}€`;
                 } else {
